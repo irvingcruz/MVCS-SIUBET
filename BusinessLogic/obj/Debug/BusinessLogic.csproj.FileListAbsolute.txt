@@ -1,0 +1,9 @@
+C:\apps-ogei\SIUBET\BusinessLogic\bin\Debug\BusinessLogic.dll
+C:\apps-ogei\SIUBET\BusinessLogic\bin\Debug\BusinessLogic.pdb
+C:\apps-ogei\SIUBET\BusinessLogic\bin\Debug\BusinessEntity.dll
+C:\apps-ogei\SIUBET\BusinessLogic\bin\Debug\DataAccess.dll
+C:\apps-ogei\SIUBET\BusinessLogic\bin\Debug\BusinessEntity.pdb
+C:\apps-ogei\SIUBET\BusinessLogic\bin\Debug\DataAccess.pdb
+C:\apps-ogei\SIUBET\BusinessLogic\obj\Debug\BusinessLogic.csprojResolveAssemblyReference.cache
+C:\apps-ogei\SIUBET\BusinessLogic\obj\Debug\BusinessLogic.dll
+C:\apps-ogei\SIUBET\BusinessLogic\obj\Debug\BusinessLogic.pdb

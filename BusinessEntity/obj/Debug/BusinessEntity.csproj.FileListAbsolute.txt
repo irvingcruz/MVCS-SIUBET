@@ -1,0 +1,5 @@
+C:\apps-ogei\SIUBET\BusinessEntity\bin\Debug\BusinessEntity.dll
+C:\apps-ogei\SIUBET\BusinessEntity\bin\Debug\BusinessEntity.pdb
+C:\apps-ogei\SIUBET\BusinessEntity\obj\Debug\BusinessEntity.csprojResolveAssemblyReference.cache
+C:\apps-ogei\SIUBET\BusinessEntity\obj\Debug\BusinessEntity.dll
+C:\apps-ogei\SIUBET\BusinessEntity\obj\Debug\BusinessEntity.pdb

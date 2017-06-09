@@ -1,0 +1,214 @@
+﻿<script>
+    $('#dp2').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+    $('#dp3').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+</script>
+@model BusinessEntity.BEMovimiento
+
+@using (Html.BeginForm(null,null,FormMethod.Post, new {  @id = "frmDev", @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+                <span class="control-label">Fecha Emisión</span>
+                <div class='input-group date' id='dp2'>
+                    @Html.EditorFor(model => model.FechaEmision, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+                <label>Responsable</label>
+                @Html.DropDownListFor(model => model.IDResponsable, ViewData["Responsables"] as SelectList, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+                <label>Doc.Emisión</label>
+                @Html.TextBoxFor(model => model.FileEmision, null, new { type = "file", @class = "form-control" })
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+                <span class="control-label">Fecha Salida</span>
+                <div class='input-group date' id='dp3'>
+                    @Html.EditorFor(model => model.FechaMov, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+                <label>N° Cargo</label>
+                @Html.EditorFor(model => model.NumeroCargo, new { htmlAttributes = new { @class = "form-control", @placeholder = "0001-2017" } })
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+                <label>&nbsp;</label>
+                @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-5">
+            <div class="form-group">
+                <label>Unidad Ejecutora</label>
+                @Html.EditorFor(model => model.EntidadDestino, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-7">
+            <div class="form-group">
+                <label>Observaciones</label>                   
+                @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @maxlength = "100" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <div id="gridExpedientesSelectedDEV"></div>
+                @*@Html.EditorFor(model => model.ET_selected, new { htmlAttributes = new { @class = "form-control", @id = "id_exps_selected" } })*@
+                <input type="hidden" name="ET_selected_D" id="ET_selected_D" class="form-control" value="" />
+                @Html.EditorFor(model => model.IDTipoMov, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })                                
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <input type="button" id="btnGrabarDev" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+}
+
+<script>  
+    $("#btnGrabarDev").on("click", function () {
+        var _Data = new FormData(document.getElementById("frmDev"));
+        $.ajax({
+            url: $urlReal + "Movimiento/DevCrear",
+            //data: $("#frmDev").serialize(),
+            data: _Data,
+            type: 'POST',            
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,   // tell jQuery not to set contentType
+            //dataType: "json",
+            //contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                //console.log(result);
+                if (result.success == true) {
+                    showNotification(result.message, notificationTypes.success, 2000);
+                    popupDevolucion.dxPopup("instance").hide();
+                    gridExpedientes.dxDataGrid("instance").refresh();
+                } else {
+                    showNotification(result.message, notificationTypes.warning, 2000);
+                }                
+            },
+            error: function () {
+                showNotification("Error al procesar dicha operación", notificationTypes.error, 2000);
+            },
+            timeout: 500000
+        });
+    });
+    var id_exps_selected = $("#et_selected").val();
+
+    var gridExpedientesSelected = $("#gridExpedientesSelectedDEV").dxDataGrid({
+        columns: [
+			{ dataField: "Nro", caption: "#" },
+			//{ dataField: "IDVersion", caption: "ID", },
+			//{ dataField: "IDExpTecnico", caption: "IDExpTec", alignment: "center", },
+			{ dataField: "Snip", alignment: "center", },
+			//{ dataField: "NombreProyecto", caption: "Nombre del Proyecto", width: 550, },
+			{ dataField: "NVersion", caption: "N° Versión", width: 150, },
+            { dataField: "DocumentoOficioSITRAD", width: 250, },
+            { dataField: "FechaOficio", caption: "Fec. Oficio", width: 100, },
+            { dataField: "NumeroHT", width: 100, },
+            { dataField: "FechaIngreso", caption: "Fec. Ingreso", width: 100, },
+			//{ dataField: "Activo", dataType: "boolean", alignment: "center", },
+        ],
+        remoteOperations: true,
+        scrolling: {
+            mode: "standard",
+        },
+        sorting: {
+            mode: "none"
+        },
+        paging: {
+            enabled: true,
+            pageIndex: 0,
+            pageSize: 10
+        },
+        pager: {
+            showPageSizeSelector: true,
+            showNavigationButtons: true,
+            showInfo: true,
+            allowedPageSizes: [10, 20, 50, 100, 200],
+            infoText: $infoTextPaginado,
+        },
+        loadPanel: {
+            text: $textLoad
+        },
+        noDataText: $noDataText,
+        selection: {
+            mode: "single"
+        },
+        wordWrapEnabled: true,
+        showColumnLines: false,
+        showRowLines: false,
+        rowAlternationEnabled: true,
+        hoverStateEnabled: true,
+        columnAutoWidth: true,
+        allowColumnResizing: true,
+    });
+    var pageIndex = 0;    
+    var listadoExpedientes = new DevExpress.data.CustomStore({
+        load: function (loadOptions) {
+            var deferred = $.Deferred(),
+				args = {};
+            $("#ET_selected_D").val(id_exps_selected);
+            args.IdsExpedientes = id_exps_selected;
+            args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientesSelected.dxDataGrid("instance")._options.paging.pageIndex + 1;
+            args.pageSize = loadOptions.take || 10;
+
+            $.ajax({
+                url: $urlReal + "Expedientes/ListadoExpedientesSelected",
+                data: JSON.stringify(args),
+                type: 'POST',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    //console.log(result)
+                    $stateSearch = false;
+                    $(".totalRowsFilter").text(result.totalRowsFilter)
+                    $(".totalRows").text(result.totalRows)
+                    showNotification(result.message, notificationTypes.success, 2000);
+                    deferred.resolve(result.items, { totalCount: result.totalRowsFilter });
+                },
+                error: function () {
+                    deferred.reject($infoTextError);
+                },
+                timeout: 500000
+            });
+            return deferred.promise();
+        },
+
+    });
+
+    gridExpedientesSelected.dxDataGrid("instance").option({
+        dataSource: {
+            store: listadoExpedientes
+        },
+    });   
+
+</script>

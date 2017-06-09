@@ -1,0 +1,7 @@
+C:\apps-ogei\SIUBET\DataAccess\bin\Release\DataAccess.dll
+C:\apps-ogei\SIUBET\DataAccess\bin\Release\DataAccess.pdb
+C:\apps-ogei\SIUBET\DataAccess\bin\Release\BusinessEntity.dll
+C:\apps-ogei\SIUBET\DataAccess\bin\Release\BusinessEntity.pdb
+C:\apps-ogei\SIUBET\DataAccess\obj\Release\DataAccess.csprojResolveAssemblyReference.cache
+C:\apps-ogei\SIUBET\DataAccess\obj\Release\DataAccess.dll
+C:\apps-ogei\SIUBET\DataAccess\obj\Release\DataAccess.pdb

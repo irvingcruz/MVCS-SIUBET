@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - MVCS</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    <link href="~/Scripts/devextreme/css/dx.spa.css" rel="stylesheet" />
+    <link href="~/Scripts/devextreme/css/dx.common.css" rel="stylesheet" />
+    <link href="~/Scripts/devextreme/css/dx.light.compact.css" rel="stylesheet" />
+    <script src="~/Scripts/devextreme/js/dx.all.js"></script>
+
+    @*Archivos personalizados por ICR*@
+    <script src="~/Scripts/devextreme/global-app.js"></script>
+    <link href="~/Content/mi.estilo.css" rel="stylesheet" />    
+
+    <link href="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/build/css/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
+    <script src="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/src/js/bootstrap-datetimepicker.js"></script>
+
+    <script src="~/Scripts/devextreme/1.Padre.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            @*<div class="navbar-header" style="height: 10px;">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("SIUBET", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>*@
+            @*<div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
+                </ul>
+            </div>*@
+            <ul class="nav navbar-nav navbar-right ">
+                <li class="dropdown panelSession">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Usuario: | <label style="font-style: italic;">Irving Cruz</label>  <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"> > Cerrar Sesión</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <div class="container body-content">
+        <div style="height: 35px;">-</div>
+        <div class="jumbotron banner">
+            <img id="logo" src="" />
+        </div>
+        <div class="row menu">
+            <ul class="nav nav-tabs nav-justified">
+                <li><a href="/SIUBET"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Inicio</a></li>
+                <li><a href="/SIUBET/Movimiento/DevIndex"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Devoluciones</a></li>
+                <li><a href="/SIUBET/Movimiento/PreIndex"><span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> Prestamos</a></li>
+                <li><a href=""><span class="glyphicon glyphicon-share" aria-hidden="true"></span> Transferencias</a></li>
+                <li><a href=""><span class="glyphicon glyphicon-book" aria-hidden="true"></span> Custodia</a></li>
+            </ul>
+        </div>
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - OGEI | MVCS</p>
+        </footer>
+    </div>
+
+    
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

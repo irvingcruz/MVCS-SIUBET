@@ -1,0 +1,4 @@
+C:\apps-ogei\SIUBET\BusinessEntity\bin\Release\BusinessEntity.dll
+C:\apps-ogei\SIUBET\BusinessEntity\bin\Release\BusinessEntity.pdb
+C:\apps-ogei\SIUBET\BusinessEntity\obj\Release\BusinessEntity.dll
+C:\apps-ogei\SIUBET\BusinessEntity\obj\Release\BusinessEntity.pdb

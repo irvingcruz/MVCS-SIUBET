@@ -1,0 +1,70 @@
+﻿<script>
+    $('#dp1').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+</script>
+@model BusinessEntity.BEMovimiento
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmPre", @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <input type="hidden" name="IDMovimiento" id="IDMovimiento" value="@Model.IDMovimiento" />
+            <div class="form-group">
+                <span class="control-label">Fecha</span>
+                <div class='input-group date' id='dp1'>
+                    @Html.EditorFor(model => model.FechaFinal, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label>&nbsp;</label>
+                @Html.TextBoxFor(model => model.FileFinal, null, new { type = "file", @class = "form-control" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <input type="button" id="btnRetonar" value="Grabar" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $("#btnRetonar").on("click", function () {
+        var _Data = new FormData(document.getElementById("frmPre"));
+        $.ajax({
+            url: $urlReal + "/Movimiento/PreRetornar",
+            //data: $("#frmDev").serialize(),
+            data: _Data,
+            type: 'POST',
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,   // tell jQuery not to set contentType
+            //dataType: "json",
+            //contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                //console.log(result);
+                if (result.success == true) {
+                    showNotification(result.message, notificationTypes.success, 2000);
+                    RetornaRecepciona.dxPopup("instance").hide();
+                    gridPrestamos.dxDataGrid("instance").refresh();
+                } else {
+                    showNotification(result.message, notificationTypes.warning, 2000);
+                }
+            },
+            error: function () {
+                showNotification("Error al procesar dicha operación", notificationTypes.error, 2000);
+            },
+            timeout: 500000
+        });
+    });
+</script>
+
+
