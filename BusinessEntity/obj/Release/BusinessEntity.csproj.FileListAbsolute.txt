@@ -2,3 +2,7 @@ C:\apps-ogei\SIUBET\BusinessEntity\bin\Release\BusinessEntity.dll
 C:\apps-ogei\SIUBET\BusinessEntity\bin\Release\BusinessEntity.pdb
 C:\apps-ogei\SIUBET\BusinessEntity\obj\Release\BusinessEntity.dll
 C:\apps-ogei\SIUBET\BusinessEntity\obj\Release\BusinessEntity.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessEntity\bin\Release\BusinessEntity.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessEntity\bin\Release\BusinessEntity.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessEntity\obj\Release\BusinessEntity.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessEntity\obj\Release\BusinessEntity.pdb

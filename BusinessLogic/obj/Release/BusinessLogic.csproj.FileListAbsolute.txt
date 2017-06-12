@@ -7,3 +7,12 @@ C:\apps-ogei\SIUBET\BusinessLogic\bin\Release\DataAccess.pdb
 C:\apps-ogei\SIUBET\BusinessLogic\obj\Release\BusinessLogic.csprojResolveAssemblyReference.cache
 C:\apps-ogei\SIUBET\BusinessLogic\obj\Release\BusinessLogic.dll
 C:\apps-ogei\SIUBET\BusinessLogic\obj\Release\BusinessLogic.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\bin\Release\BusinessLogic.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\bin\Release\BusinessLogic.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\bin\Release\BusinessEntity.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\bin\Release\DataAccess.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\bin\Release\BusinessEntity.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\bin\Release\DataAccess.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\obj\Release\BusinessLogic.csprojResolveAssemblyReference.cache
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\obj\Release\BusinessLogic.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\BusinessLogic\obj\Release\BusinessLogic.pdb

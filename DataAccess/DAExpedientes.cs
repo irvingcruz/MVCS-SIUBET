@@ -24,8 +24,8 @@ namespace DataAccess
                 SqlCommand cmd = new SqlCommand("spSUX_ListarExpedientes", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Snip", _oExp.Snip);
-                cmd.Parameters.AddWithValue("@Numero", _oExp.NVersion);
-                cmd.Parameters.AddWithValue("@NombreProyecto", _oExp.NombreProyecto);
+                cmd.Parameters.AddWithValue("@NumeroHT", _oExp.NumeroHT);
+                cmd.Parameters.AddWithValue("@Estado", _oExp.Estado);
                 oCon.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                 {
@@ -37,11 +37,10 @@ namespace DataAccess
                         oExp.IDExpTecnico = Convert.ToInt32(dr["IDExpTecnico"]);
                         oExp.Snip = Convert.ToInt32(dr["Snip"]);
                         oExp.NombreProyecto = dr["NombreProyecto"].ToString();
-                        oExp.Seccion = dr["Seccion"].ToString();
-                        oExp.Serie = dr["Serie"].ToString();
-                        oExp.SubSerie = dr["SubSerie"].ToString();
-                        oExp.NVersion = dr["NVersion"].ToString();
-                        oExp.EstadoActual = dr["EstadoActual"].ToString();
+                        oExp.NumeroHT = dr["NumeroHT"].ToString();
+                        oExp.NVersion = dr["NVersion"].ToString();                        
+                        oExp.Estado = dr["Estado"].ToString();
+                        oExp.UbiTopografica = dr["UbiTopografica"].ToString();
                         oExp.Activo = Convert.ToBoolean(dr["Activo"]);
                         listado.Add(oExp);
                     }
@@ -140,5 +139,37 @@ namespace DataAccess
             }
             return listado;
         }
+
+        public List<BEPersona> fnListarPersona(int Tipo)
+        {
+            List<BEPersona> listado = new List<BEPersona>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spSUX_ListarPersonas", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Tipo", Tipo);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        BEPersona oUE = new BEPersona();
+                        oUE.IDPersona = Convert.ToInt32(dr["ID"]);
+                        oUE.Nombres= dr["Nombres"].ToString();                       
+                        listado.Add(oUE);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return listado;
+        }
+
     }
 }

@@ -1,18 +1,26 @@
 ﻿$(document).ready(function () {
 
-	var txtCodigo = $("#txtCodigo").dxTextBox({
+    var txtNumeroHT = $("#txtNumeroHT").dxTextBox({
 		placeholder: "Escribir código...",
 		showClearButton: true,
 	});
 
-	//var txtProyecto = $("#txtProyecto").dxTextBox({
-	//	placeholder: "Escribir nombre del proyecto...",
-	//	showClearButton: true,
-	//});
+	var estados = [
+        "-- TODOS --",
+        "EN CUSTODIA",
+        "EN PRESTAMO",
+        "DEVUELTOS",
+        "TRANSFERIDOS",
+        "DERIVADOS",        
+	];
+
+	var cboEstado = $("#cboEstado").dxSelectBox({
+	    items: estados
+	});
 
 	function fnLimpiarFiltros() {
 		txtSnip.dxTextBox("instance").option("value", "");
-		txtCodigo.dxTextBox("instance").option("value", "");
+		txtNumeroHT.dxTextBox("instance").option("value", "");
 		//txtProyecto.dxTextBox("instance").option("value", "");
 	}
 
@@ -75,11 +83,11 @@
 			//{ dataField: "IDVersion", caption: "ID", },
 			//{ dataField: "IDExpTecnico", caption: "IDExpTec", alignment: "center", },
 			{ dataField: "Snip", alignment: "center", },
-			{ dataField: "Seccion", width: 100, },
-            { dataField: "Serie", width: 300, },
-			{ dataField: "NVersion", caption: "N° Versión", width: 150, },
-            { dataField: "EstadoActual", caption: "Estado Actual", width: 250, },
-			{ dataField: "Activo", dataType: "boolean", alignment: "center", },
+			{ dataField: "Proyecto", width: 300, },
+            { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
+			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
+            { dataField: "Estado", caption: "Estado Actual", alignment: "center", width: 250, },
+			//{ dataField: "Activo", dataType: "boolean", alignment: "center", },
 			{
 			    caption: "...",
 			    //fixed: true,
@@ -207,8 +215,8 @@
 					args = {};
 				args.snip = txtSnip.dxTextBox("instance").option("value");
 				if (args.snip == "") args.snip = 0;
-				args.codigo = txtCodigo.dxTextBox("instance").option("value");
-				args.proyecto = '';//txtProyecto.dxTextBox("instance").option("value");
+				args.numeroHT = txtNumeroHT.dxTextBox("instance").option("value");
+				args.proyecto = cboEstado.dxSelectBox("instance").option("value");
 				args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientes.dxDataGrid("instance")._options.paging.pageIndex + 1;
 				args.pageSize = loadOptions.take || 10;
 

@@ -16,11 +16,11 @@
         columns: [
 
             { dataField: "Nro", caption: "#", alignment: "center", },
-            //{ dataField: "IDMovimiento", caption: "ID", },
+            { dataField: "Correlativo", caption: "NRO.MOV.", alignment: "center", width: 100, },
             //{ dataField: "TipoMov", },
             //{ dataField: "FechaEmision", caption: "F.Emisión", alignment: "center", width: 150, },
             {
-                caption: "F.Emisión",
+                caption: "Fec. Emisión",
                 //alignment: "center",
                 width: 140,
                 cellTemplate: function (container, options) {
@@ -34,7 +34,7 @@
                     
                 }
             },
-            { dataField: "FechaMov", caption: "Fec. Movimiento", alignment: "center", width: 140, },
+            { dataField: "FechaMov", caption: "Fec. Salida", alignment: "center", width: 140, },
             { dataField: "Responsable", width: 150, },
             //{ dataField: "NumeroCargo", caption: "N° Cargo", width: 100, },
             {
@@ -43,8 +43,12 @@
                 width: 100,
                 cellTemplate: function (container, options) {
                     var item = options.data;
-                    btnCargo = $('<span>' + item.NumeroCargo + '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/D/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>');
-                    btnCargo.appendTo(container);
+                    var dato = '<span>' + item.NumeroCargo + '</span>';
+                    if (item.NombreFileFinal.length == 0) {
+                        dato += '&nbsp;&nbsp;</span><a href="' + $urlReal + 'Uploads/D/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
+                    }
+                    dato = $(dato);                    
+                    dato.appendTo(container);
                 }
             },
             { dataField: "EntidadDestino", caption: "Unidad Ejecutora", width: 200, },
@@ -61,7 +65,6 @@
                     }
                     dato = $(dato);
                     dato.appendTo(container);
-
                 }
             },
             { dataField: "Estado", width: 100, },

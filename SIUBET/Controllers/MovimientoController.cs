@@ -13,6 +13,10 @@ namespace SIUBET.Controllers
 {
     public class MovimientoController : Controller
     {
+        private string vMsgSuccess = "El registró se guardó correctamente.";
+        private string vMsgFail = "Error al tratar de guadar el registro.";
+        private string vMsgThrow = "Error inesperado al procesar el registro.";
+             
         public ActionResult DevCrear()
         {
             ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarResponsables(), "IDResponsable", "Descripcion");
@@ -30,51 +34,54 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            string message = "";
             try
             {
-                if (oDevolucion.NumeroCargo == null || oDevolucion.NumeroCargo.Trim().Length <= 0) message = "Ingrese el número de cargo";
-                if (message.Trim().Length == 0 && (oDevolucion.EntidadDestino == null || oDevolucion.EntidadDestino.Trim().Length <= 0)) message = "Ingrese la Unidad Ejecutora";
-
-                if (message.Trim().Length == 0)
+                if (oDevolucion.NumeroCargo == null || oDevolucion.NumeroCargo.Trim().Length <= 0)
                 {
-                    string _file = DateTime.Now.ToString("yyyyMMddHHmmss");
-                    string adjuntoFileEmision = "";
-                    string adjuntoFileCargo = "";
-                    if (oDevolucion.FileEmision != null)
-                    {
-                        adjuntoFileEmision = _file + Path.GetExtension(oDevolucion.FileEmision.FileName);
-                        oDevolucion.NombreFileEmision = adjuntoFileEmision;
-                    }
-                    if (oDevolucion.FileCargo != null)
-                    {
-                        adjuntoFileCargo = _file + "_" + oDevolucion.NumeroCargo + Path.GetExtension(oDevolucion.FileCargo.FileName);
-                        oDevolucion.NombreFileCargo = adjuntoFileCargo;
-                    }
+                    result.message = "Ingrese el número de cargo";
+                    goto Terminar;
+                }
+                if (oDevolucion.EntidadDestino == null || oDevolucion.EntidadDestino.Trim().Length <= 0)
+                {
+                    result.message = "Seleccione ó Ingrese la Unidad Ejecutora";
+                    goto Terminar;
+                }
+                if (oDevolucion.FileEmision == null)
+                {
+                    result.message = "Debe anexar un documento para la Emisión";
+                    goto Terminar;
+                }
+                if (oDevolucion.FileCargo == null)
+                {
+                    result.message = "Debe anexar un documento para el cargo";
+                    goto Terminar;
+                }
 
-                    rpta = new BLMovimientos().fnInsertarMovDevolucion(oDevolucion);
+                oDevolucion.ExtensionFile = Path.GetExtension(oDevolucion.FileEmision.FileName);
+                rpta = new BLMovimientos().fnInsertarMovDevolucion(oDevolucion);
 
-                    if (rpta)
-                    {
-                        if (adjuntoFileEmision.Length > 0) oDevolucion.FileEmision.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileEmision));
-                        if (adjuntoFileCargo.Length > 0) oDevolucion.FileCargo.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileCargo));
-                        message = "El registro se guardó correctamente";
-                    }
-                    else
-                    {
-                        message = "Error al insertar el registro.";
-                    }
-
+                if (rpta)
+                {
+                    string adjuntoFileEmision = oDevolucion.Archivo + "-E" + Path.GetExtension(oDevolucion.FileEmision.FileName);
+                    string adjuntoFileCargo = oDevolucion.Archivo + "-S" + Path.GetExtension(oDevolucion.FileCargo.FileName);
+                    oDevolucion.FileEmision.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileEmision));
+                    oDevolucion.FileCargo.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileCargo));
+                    result.message = vMsgSuccess;
+                }
+                else
+                {
+                    result.message = vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                message = "Error inesperado al procesar el movimiento";
+                result.message = vMsgThrow;
             }
+            Terminar:
             result.items = null;
             result.success = rpta;
-            result.message = message;
+            //result.message = message;
             return new JsonResult { Data = result };
         }
         public ActionResult DevIndex()
@@ -83,7 +90,6 @@ namespace SIUBET.Controllers
         }                
         public ActionResult DevRecepcionar(int id)
         {
-
             BEMovimiento oDevolucion = new BEMovimiento();
             oDevolucion.IDMovimiento = id;
             oDevolucion.FechaFinal = DateTime.Now.ToShortDateString();
@@ -97,37 +103,40 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            string message = "";
+            //string message = "";
             try
             {
-                string _file = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string adjuntoFileFinal = "";
-                if (oDevolucion.FileFinal != null)
-                {
-                    adjuntoFileFinal = _file + Path.GetExtension(oDevolucion.FileFinal.FileName);
-                    oDevolucion.NombreFileFinal = adjuntoFileFinal;
+                if (oDevolucion.FileFinal == null) {
+                    result.message = "Debe anexar un documento.";
+                    goto Terminar;
                 }
 
+                oDevolucion.ExtensionFile = Path.GetExtension(oDevolucion.FileFinal.FileName);
                 rpta = new BLMovimientos().fnRetornaPre_RecepcionaDev(oDevolucion);
 
                 if (rpta)
                 {
-                    if (adjuntoFileFinal.Length > 0) oDevolucion.FileFinal.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileFinal));
-                    message = "La recepción se guardó correctamente";
+                    var file = Path.Combine(HttpContext.Server.MapPath("~/Uploads/D/"), oDevolucion.Archivo + "-S" + oDevolucion.ExtensionFile);
+                    if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
+
+                    string adjuntoFileFinal = oDevolucion.Archivo + "-R" + Path.GetExtension(oDevolucion.FileFinal.FileName);                                        
+                    oDevolucion.FileFinal.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileFinal));
+                    result.message = vMsgSuccess;
                 }
                 else
                 {
-                    message = "Error al recepcionar la devolución.";
+                    result.message = vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                message = "Error inesperado al procesar el movimiento";
+                result.message = vMsgThrow;
             }
+            Terminar:
             result.items = null;
             result.success = rpta;
-            result.message = message;
+            //result.message = message;
             return new JsonResult { Data = result };
         }
         [HttpPost]
@@ -171,43 +180,42 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            string message = "";
             try
             {
-                if (message.Trim().Length == 0 && (oPrestamo.EntidadDestino == null || oPrestamo.EntidadDestino.Trim().Length <= 0)) message = "Ingrese el Ingeniero/Otros";
-
-                if (message.Trim().Length == 0)
+                if (oPrestamo.EntidadDestino == null || oPrestamo.EntidadDestino.Trim().Length <= 0)
                 {
-                    string _file = DateTime.Now.ToString("yyyyMMddHHmmss");
-                    string adjuntoFileCargo = "";
-                    if (oPrestamo.FileCargo != null)
-                    {
-                        adjuntoFileCargo = _file + Path.GetExtension(oPrestamo.FileCargo.FileName);
-                        oPrestamo.NombreFileCargo = adjuntoFileCargo;
-                    }
+                    result.message = "Seleccione ó Ingrese el Ingeniero/Otros";
+                    goto Terminar;
+                }
+                if (oPrestamo.FileCargo == null)
+                {
+                    result.message = "Debe anexar un documento de cargo.";
+                    goto Terminar;
+                }
 
-                    rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo);
+                oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
+                rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo);
 
-                    if (rpta)
-                    {
-                        if (adjuntoFileCargo.Length > 0) oPrestamo.FileCargo.SaveAs(Server.MapPath("~/Uploads/P/" + adjuntoFileCargo));
-                        message = "El registro se guardó correctamente";
-                    }
-                    else
-                    {
-                        message = "Error al insertar el registro.";
-                    }
-
+                if (rpta)
+                {
+                    string adjuntoFileCargo = oPrestamo.Archivo + "-S" + Path.GetExtension(oPrestamo.FileCargo.FileName);
+                    oPrestamo.FileCargo.SaveAs(Server.MapPath("~/Uploads/P/" + adjuntoFileCargo));
+                    result.message = vMsgSuccess;
+                }
+                else
+                {
+                    result.message = vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                message = "Error inesperado al procesar el movimiento";
+                result.message = vMsgThrow;
             }
+            Terminar:
             result.items = null;
             result.success = rpta;
-            result.message = message;
+            //result.message = message;
             return new JsonResult { Data = result };
         }
         public ActionResult PreRetornar(int id)
@@ -220,7 +228,7 @@ namespace SIUBET.Controllers
             return PartialView(oDevolucion);
         }
         [HttpPost]
-        public ActionResult PreRetornar(BEMovimiento oDevolucion)
+        public ActionResult PreRetornar(BEMovimiento oPrestamo)
         {
             if (!Request.IsAjaxRequest()) return null;
 
@@ -229,31 +237,35 @@ namespace SIUBET.Controllers
             string message = "";
             try
             {
-                string _file = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string adjuntoFileFinal = "";
-                if (oDevolucion.FileFinal != null)
+                if (oPrestamo.FileFinal == null)
                 {
-                    adjuntoFileFinal = _file + Path.GetExtension(oDevolucion.FileFinal.FileName);
-                    oDevolucion.NombreFileFinal = adjuntoFileFinal;
-                }
+                    result.message = "Debe anexar un documento de cargo";
+                    goto Terminar;
+                }                                
 
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDev(oDevolucion);
+                oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileFinal.FileName);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDev(oPrestamo);
 
                 if (rpta)
                 {
-                    if (adjuntoFileFinal.Length > 0) oDevolucion.FileFinal.SaveAs(Server.MapPath("~/Uploads/P/" + adjuntoFileFinal));
-                    message = "El retorno del documento se guardó correctamente";
+                    var file = Path.Combine(HttpContext.Server.MapPath("~/Uploads/P/"), oPrestamo.Archivo + "-S" + oPrestamo.ExtensionFile);
+                    if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
+
+                    string adjuntoFileFinal = oPrestamo.Archivo + "-R" + Path.GetExtension(oPrestamo.FileFinal.FileName); ;
+                    oPrestamo.FileFinal.SaveAs(Server.MapPath("~/Uploads/P/" + adjuntoFileFinal));
+                    message = vMsgSuccess;
                 }
                 else
                 {
-                    message = "Error al retonar el préstamo.";
+                    message = vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                message = "Error inesperado al procesar el movimiento";
+                message = vMsgThrow;
             }
+            Terminar:
             result.items = null;
             result.success = rpta;
             result.message = message;
@@ -283,7 +295,7 @@ namespace SIUBET.Controllers
             }
             catch (Exception)
             {
-                message = "Error inesperado al procesar la anulación";
+                message = vMsgThrow;
             }
             result.items = null;
             result.success = rpta;

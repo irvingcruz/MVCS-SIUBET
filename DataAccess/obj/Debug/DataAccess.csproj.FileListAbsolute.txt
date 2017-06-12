@@ -5,3 +5,10 @@ C:\apps-ogei\SIUBET\DataAccess\bin\Debug\BusinessEntity.pdb
 C:\apps-ogei\SIUBET\DataAccess\obj\Debug\DataAccess.csprojResolveAssemblyReference.cache
 C:\apps-ogei\SIUBET\DataAccess\obj\Debug\DataAccess.dll
 C:\apps-ogei\SIUBET\DataAccess\obj\Debug\DataAccess.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\bin\Debug\DataAccess.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\bin\Debug\DataAccess.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\bin\Debug\BusinessEntity.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\bin\Debug\BusinessEntity.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\obj\Debug\DataAccess.csprojResolveAssemblyReference.cache
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\obj\Debug\DataAccess.dll
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\DataAccess\obj\Debug\DataAccess.pdb

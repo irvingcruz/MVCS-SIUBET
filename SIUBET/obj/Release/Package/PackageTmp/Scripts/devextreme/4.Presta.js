@@ -25,7 +25,7 @@
                 width: 150,
                 cellTemplate: function (container, options) {
                     var item = options.data;
-                    btnCargo = $('<span>' + item.NombreFileCargo + '&nbsp;&nbsp;</span><a href="../../Uploads/P/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>');
+                    btnCargo = $('<span>' + item.NombreFileCargo + '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/P/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>');
                     btnCargo.appendTo(container);
                 }
             },

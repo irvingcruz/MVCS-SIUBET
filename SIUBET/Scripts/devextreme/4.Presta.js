@@ -16,8 +16,8 @@
         columns: [
 
             { dataField: "Nro", caption: "#", alignment: "center", },
-            { dataField: "FechaMov", caption: "Fec. Movimiento", alignment: "center", width: 140, },
-            { dataField: "Plazo", caption: "Plazo (Días)", alignment: "center", width: 80, },
+            { dataField: "FechaMov", caption: "Fec. Salida", alignment: "center", width: 140, },
+            { dataField: "Plazo", caption: "Días Trans.", alignment: "center", width: 80, },
             { dataField: "FechaRetornoEstimada", caption: "Fec. Retorno Estimada", alignment: "center", width: 135, },
             {
                 caption: "Cargo",
@@ -38,9 +38,9 @@
                 cellTemplate: function (container, options) {
                     var item = options.data;
                     var dato = '<span>' + item.FechaFinal + '</span>';
-                    if (item.NombreFileFinal.length > 0) {
+                    /*if (item.NombreFileFinal.length > 0) {
                         dato += '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/P/' + item.NombreFileFinal + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
-                    }
+                    }*/
                     dato = $(dato);
                     dato.appendTo(container);
 

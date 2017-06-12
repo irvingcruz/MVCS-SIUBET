@@ -173,3 +173,7 @@ function openPopupRetornaRecepciona(options) {
 
     RetornaRecepciona.dxPopup("instance").show();
 }
+
+
+
+

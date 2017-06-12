@@ -39,5 +39,8 @@ namespace BusinessEntity
         public int Plazo { get; set; }
         public string FechaRetornoEstimada { get; set; }
         public string Motivo { get; set; }
+        public string Archivo { get; set; }
+        public string ExtensionFile { get; set; }
+        public string Correlativo { get; set; }
     }
 }

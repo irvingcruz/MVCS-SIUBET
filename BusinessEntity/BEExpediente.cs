@@ -22,11 +22,12 @@ namespace BusinessEntity
         public string UnidadConservacion { get; set; }
         public string Folios { get; set; }
         public string CDs { get; set; }
-        public string EstadoActual { get; set; }
+        public string Estado { get; set; }
         public bool Activo { get; set; }
         public string Seccion { get; set; }
         public string Serie { get; set; }
         public string SubSerie { get; set; }
+        public string UbiTopografica { get; set; }
 
     }
 }

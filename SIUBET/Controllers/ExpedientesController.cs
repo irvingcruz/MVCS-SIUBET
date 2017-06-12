@@ -19,14 +19,14 @@ namespace SIUBET.Controllers
 
 
         [HttpPost]
-        public JsonResult ListadoExpedientes(int snip, string codigo, string proyecto, int pageNumber, int pageSize) {
+        public JsonResult ListadoExpedientes(int snip, string numeroHT, string estado, int pageNumber, int pageSize) {
             
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
             
             int totalRows = 0;
             int totalRowsFilter = 0;
-            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, codigo, proyecto, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
+            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, estado, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
             //Dim datosResult = New ReglaValidacionApp().ReglasVerificacionListarFiltradoPaginado(filtros, oUsuario.dni, pageIndex, take, TotalRows, TotalRowFilter)
 
 
@@ -73,6 +73,27 @@ namespace SIUBET.Controllers
             result.totalRowsFilter = result.totalRows;
             result.success = true;
             result.message = result.totalRowsFilter + " registros seleccionados";
+
+
+            return new JsonResult { Data = result };
+        }
+
+        [HttpPost]
+        public JsonResult ListadoPersonas(int Tipo)
+        {
+
+            if (!Request.IsAjaxRequest()) return null;
+            ObjetoJson result = new ObjetoJson();
+
+            int totalRows = 0;
+            int totalRowsFilter = 0;
+            List<BEPersona> datosResult = new BLExpedientes().fnListarPersona(Tipo);            
+
+            result.items3 = datosResult;
+            result.totalRows = totalRows;
+            result.totalRowsFilter = totalRowsFilter;
+            result.success = true;
+            result.message = totalRowsFilter + " registros encontrados";
 
 
             return new JsonResult { Data = result };
