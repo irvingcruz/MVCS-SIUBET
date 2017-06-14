@@ -27,7 +27,7 @@
                     var item = options.data;
                     var dato = '<span>' + item.FechaEmision + '</span>';
                     if (item.NombreFileEmision.length > 0) {
-                        dato += '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/D/' + item.NombreFileEmision + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
+                        dato += '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/' + item.NombreFileEmision + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
                     }
                     dato = $(dato);
                     dato.appendTo(container);
@@ -36,7 +36,7 @@
             },
             { dataField: "FechaMov", caption: "Fec. Salida", alignment: "center", width: 140, },
             { dataField: "Responsable", width: 150, },
-            //{ dataField: "NumeroCargo", caption: "N° Cargo", width: 100, },
+            { dataField: "TipoMov", caption: "T.Mov.", width: 100, },
             {
                 caption: "N° Cargo",
                 alignment: "center",
@@ -45,13 +45,13 @@
                     var item = options.data;
                     var dato = '<span>' + item.NumeroCargo + '</span>';
                     if (item.NombreFileFinal.length == 0) {
-                        dato += '&nbsp;&nbsp;</span><a href="' + $urlReal + 'Uploads/D/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
+                        dato += '&nbsp;&nbsp;</span><a href="' + $urlReal + 'Uploads/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
                     }
                     dato = $(dato);                    
                     dato.appendTo(container);
                 }
             },
-            { dataField: "EntidadDestino", caption: "Unidad Ejecutora", width: 200, },
+            { dataField: "EntidadDestino", caption: "Unidad Ejecutora / CAC", width: 200, },
             //{ dataField: "FechaRecepcion", caption: "Fec. Recepción", alignment: "center", width: 100, },
             {
                 caption: "Fec. Recepción",
@@ -61,13 +61,14 @@
                     var item = options.data;
                     var dato = '<span>' + item.FechaFinal + '</span>';
                     if (item.NombreFileFinal.length > 0) {
-                        dato += '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/D/' + item.NombreFileFinal + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
+                        dato += '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/' + item.NombreFileFinal + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
                     }
                     dato = $(dato);
                     dato.appendTo(container);
                 }
             },
             { dataField: "Estado", width: 100, },
+            { dataField: "Motivo", caption: "Motivo Anulación", width: 200, },
             { dataField: "Activo", dataType: "boolean", alignment: "center", },
             {
                 caption: "...",
@@ -77,6 +78,14 @@
                 width: 35,
                 cellTemplate: function (container, options) {
                     var item = options.data;
+                    var disabledR = true;
+                    var disabledA = true;
+                    if (item.Activo == true) {
+                        if (item.FechaFinal.length <= 0) {
+                            disabledR = false;
+                            disabledA = false;
+                        }
+                    }
                     $('<div />').appendTo(container)
                     .dxToolbar({
                         items: [
@@ -84,7 +93,7 @@
                                 location: 'after',
                                 widget: 'dxButton',
                                 locateInMenu: 'auto',
-                                disabled: item.FechaFinal.length > 0 ? true : false,
+                                disabled: disabledR,
                                 options: {
                                     icon: "glyphicon glyphicon-ok-circle",
                                     text: "Recepcionar",
@@ -98,6 +107,7 @@
                                 location: 'after',
                                 widget: 'dxButton',
                                 locateInMenu: 'auto',
+                                disabled: disabledA,
                                 options: {
                                     icon: "glyphicon glyphicon-remove-circle",
                                     text: "Anular",
@@ -154,7 +164,6 @@
             visible: false
         },
     });
-
     fnListarMovimientos(0, 2, gridDevoluciones.dxDataGrid("instance"));
 
 });

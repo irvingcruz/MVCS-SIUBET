@@ -19,7 +19,8 @@ namespace BusinessEntity
         public int IDResponsable { get; set; }
         public string Responsable { get; set; }
         public string NumeroCargo { get; set; }        
-        public string EntidadDestino { get; set; }
+        public string Ing_Evaluador { get; set; }
+        public string UndEjec_CAC { get; set; }
         public string Observaciones { get; set; }
         public string FechaFinal { get; set; }
         public string ET_selected_D { get; set; }

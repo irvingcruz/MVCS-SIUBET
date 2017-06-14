@@ -84,5 +84,23 @@ namespace BusinessLogic
                 throw;
             }
         }
+
+        public List<BEExpediente> fnListarExpedientesEnRetorno(int IDMovimiento, int pageNumber, int pageSize)
+        {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAExpedientes obj = new DAExpedientes(oCon);
+                List<BEExpediente> resultado = obj.fnListarExpedientesEnRetorno(IDMovimiento);
+                resultado = resultado.OrderBy(e => e.Nro)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize).ToList();
+                return resultado;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

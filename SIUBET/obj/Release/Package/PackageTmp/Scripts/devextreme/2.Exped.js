@@ -1,18 +1,32 @@
 ﻿$(document).ready(function () {
 
-	var txtCodigo = $("#txtCodigo").dxTextBox({
+    var txtNumeroHT = $("#txtNumeroHT").dxTextBox({
 		placeholder: "Escribir código...",
 		showClearButton: true,
 	});
 
-	//var txtProyecto = $("#txtProyecto").dxTextBox({
-	//	placeholder: "Escribir nombre del proyecto...",
-	//	showClearButton: true,
-	//});
+    var estados = [
+        { "ID": 0, "Name": "-- TODOS --" },
+        { "ID": 1, "Name": "TRANSFERIDOS" },
+        { "ID": 2, "Name": "DEVUELTOS" },
+        { "ID": 3, "Name": "EN CUSTODIA" },
+        { "ID": 4, "Name": "EN PRESTAMO" },
+        { "ID": 5, "Name": "DERIVADOS" },      
+	];
+
+	var cboEstado = $("#cboEstado").dxSelectBox({
+	    dataSource: new DevExpress.data.ArrayStore({
+	        data: estados,
+	        key: "ID"
+	    }),
+	    displayExpr: "Name",
+	    valueExpr: "ID",
+	    value: estados[0].ID,
+	});
 
 	function fnLimpiarFiltros() {
 		txtSnip.dxTextBox("instance").option("value", "");
-		txtCodigo.dxTextBox("instance").option("value", "");
+		txtNumeroHT.dxTextBox("instance").option("value", "");
 		//txtProyecto.dxTextBox("instance").option("value", "");
 	}
 
@@ -26,25 +40,26 @@
 
 	_selectedItems = "";
 
-	function fnOpenPopupDevolucion() {
-	    //console.log(_selectedItems);
+	function fnOpenPopupDD(IDTipoMov) {
+	    //console.log(IDTipoMov);
+        //[2]Devolución, [5]Derivación
 	    if (_selectedItems == "") {
 	        showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
 	        return;
 	    }
 
-	    popupDevolucion = $("#popup-devolucion").dxPopup({
+	    popupDD = $("#popup-DD").dxPopup({
 	        showTitle: true,
-	        title: 'Crear Devolución',
+	        title: IDTipoMov == 2 ? 'Crear Devolución' : 'Crear Derivación',
 	        width: 880,
 	        height: "auto",
 	        contentTemplate: function () {
 	            var $pageContent = $("<span />");
-	            return $pageContent.load($urlReal + 'Movimiento/DevCrear');
+	            return $pageContent.load($urlReal + 'Movimiento/DDCrear/' + IDTipoMov);
 	        },
 	        showCloseButton: true,
 	    });
-	    popupDevolucion.dxPopup("instance").show();
+	    popupDD.dxPopup("instance").show();
 	}
 
 	function fnOpenPopupPrestamo() {
@@ -76,8 +91,8 @@
 			//{ dataField: "IDExpTecnico", caption: "IDExpTec", alignment: "center", },
 			{ dataField: "Snip", alignment: "center", },
 			{ dataField: "Proyecto", width: 300, },
-            { dataField: "NumeroHT", caption: "Documento HT", alignment: "center", width: 150, },
-			{ dataField: "NVersion", caption: "Documento Ingreso", alignment: "center", width: 150, },
+            { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
+			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
             { dataField: "Estado", caption: "Estado Actual", alignment: "center", width: 250, },
 			//{ dataField: "Activo", dataType: "boolean", alignment: "center", },
 			{
@@ -112,7 +127,19 @@
 							        icon: "glyphicon glyphicon-repeat",
 							        text: "Devolución",
 							        onClick: function () {
-							            fnOpenPopupDevolucion();
+							            fnOpenPopupDD(2);
+							        }
+							    }
+							},
+							{
+							    location: 'after',
+							    widget: 'dxButton',
+							    locateInMenu: 'auto',
+							    options: {
+							        icon: "glyphicon glyphicon-repeat",
+							        text: "Derivación",
+							        onClick: function () {
+							            fnOpenPopupDD(5);
 							        }
 							    }
 							},
@@ -207,8 +234,8 @@
 					args = {};
 				args.snip = txtSnip.dxTextBox("instance").option("value");
 				if (args.snip == "") args.snip = 0;
-				args.codigo = txtCodigo.dxTextBox("instance").option("value");
-				args.proyecto = '';//txtProyecto.dxTextBox("instance").option("value");
+				args.numeroHT = txtNumeroHT.dxTextBox("instance").option("value");
+				args.estado = cboEstado.dxSelectBox("instance").option("value");
 				args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientes.dxDataGrid("instance")._options.paging.pageIndex + 1;
 				args.pageSize = loadOptions.take || 10;
 

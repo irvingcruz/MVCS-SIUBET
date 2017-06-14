@@ -3,7 +3,7 @@
 </script>
 @model BusinessEntity.BEMovimiento
 
-@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmDev", @enctype = "multipart/form-data" }))
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmDD", @enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -39,9 +39,9 @@
 }
 <script>
     $("#btnRecepcionar").on("click", function () {
-        var _Data = new FormData(document.getElementById("frmDev"));
+        var _Data = new FormData(document.getElementById("frmDD"));
         $.ajax({
-            url: $urlReal + "/Movimiento/DevRecepcionar",
+            url: $urlReal + "/Movimiento/DDRecepcionar",
             //data: $("#frmDev").serialize(),
             data: _Data,
             type: 'POST',

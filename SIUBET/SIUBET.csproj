@@ -270,9 +270,9 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Expedientes\Index.cshtml" />
-    <Content Include="Views\Movimiento\DevCrear.cshtml" />
-    <Content Include="Views\Movimiento\DevIndex.cshtml" />
-    <Content Include="Views\Movimiento\DevRecepcionar.cshtml" />
+    <Content Include="Views\Movimiento\DDCrear.cshtml" />
+    <Content Include="Views\Movimiento\DDIndex.cshtml" />
+    <Content Include="Views\Movimiento\DDRecepcionar.cshtml" />
     <Content Include="Views\Movimiento\PreIndex.cshtml" />
     <Content Include="Views\Movimiento\PreRetornar.cshtml" />
     <Content Include="Views\Movimiento\PreCrear.cshtml" />

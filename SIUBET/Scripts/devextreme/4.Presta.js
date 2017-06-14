@@ -16,6 +16,7 @@
         columns: [
 
             { dataField: "Nro", caption: "#", alignment: "center", },
+            { dataField: "Correlativo", caption: "NRO.MOV.", alignment: "center", width: 100, },
             { dataField: "FechaMov", caption: "Fec. Salida", alignment: "center", width: 140, },
             { dataField: "Plazo", caption: "Días Trans.", alignment: "center", width: 80, },
             { dataField: "FechaRetornoEstimada", caption: "Fec. Retorno Estimada", alignment: "center", width: 135, },
@@ -25,8 +26,12 @@
                 width: 150,
                 cellTemplate: function (container, options) {
                     var item = options.data;
-                    btnCargo = $('<span>' + item.NombreFileCargo + '&nbsp;&nbsp;</span><a href="'+$urlReal+'Uploads/P/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>');
-                    btnCargo.appendTo(container);
+                    var dato = '<span>' + item.NombreFileCargo + '</span>';
+                    if (item.NombreFileCargo.length > 0) {
+                        dato += '&nbsp;&nbsp;</span><a href="' + $urlReal + 'Uploads/' + item.NombreFileCargo + '" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>';
+                    }
+                    dato = $(dato);
+                    dato.appendTo(container);
                 }
             },
             { dataField: "EntidadDestino", caption: "Ingeniero/Otros", width: 200, },
@@ -46,7 +51,8 @@
 
                 }
             },
-            { dataField: "Estado", width: 100, },
+            { dataField: "Estado", width: 130, },
+            { dataField: "Motivo", caption: "Motivo Anulación", width: 200, },
             { dataField: "Activo", dataType: "boolean", alignment: "center", },
             {
                 caption: "...",
@@ -54,9 +60,14 @@
                 allowHiding: false,
                 alignment: "center",
                 width: 35,
-                cellTemplate: function (container, options) {
+                cellTemplate: function (container, options) {                    
                     var item = options.data;
-
+                    var disabledR = true;
+                    var disabledF = true;
+                    if (item.Activo == true) {
+                        if (item.FechaFinal.length <= 0 && item.NombreFileCargo.length > 0) disabledR = false;
+                        if (item.FechaFinal.length <= 0 && item.NombreFileCargo.length == 0) disabledF = false;                        
+                    }
                     $('<div />').appendTo(container)
                     .dxToolbar({
                         items: [
@@ -64,7 +75,7 @@
                                 location: 'after',
                                 widget: 'dxButton',
                                 locateInMenu: 'auto',
-                                disabled: item.FechaFinal.length > 0 ? true : false,
+                                disabled: disabledR,
                                 options: {
                                     icon: "glyphicon glyphicon-ok-circle",
                                     text: "Retornar",
@@ -74,18 +85,33 @@
                                 }
 
                             },
-                            {
-                                location: 'after',
-                                widget: 'dxButton',
-                                locateInMenu: 'auto',
-                                options: {
-                                    icon: "glyphicon glyphicon-remove-circle",
-                                    text: "Anular",
-                                    onClick: function () {
-                                        openPopupAnular(item);
-                                    }
-                                }
-                            },
+							{
+							    location: 'after',
+							    widget: 'dxButton',
+							    locateInMenu: 'auto',
+							    disabled: disabledF,
+							    options: {
+							        icon: "glyphicon glyphicon-file",
+							        text: "Anexar cargo",
+							        onClick: function () {
+							            openPopupRetornaRecepciona(item);
+							        }
+							    }
+							},
+
+                            //{
+                            //    location: 'after',
+                            //    widget: 'dxButton',
+                            //    locateInMenu: 'auto',
+                            //    disabled: disabledR,
+                            //    options: {
+                            //        icon: "glyphicon glyphicon-remove-circle",
+                            //        text: "Anular",
+                            //        onClick: function () {
+                            //            openPopupAnular(item);
+                            //        }
+                            //    }
+                            //},
                         ]
                     });
                 }

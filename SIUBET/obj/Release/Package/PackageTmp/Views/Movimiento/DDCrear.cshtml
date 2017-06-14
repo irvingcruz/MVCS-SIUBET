@@ -4,7 +4,7 @@
 </script>
 @model BusinessEntity.BEMovimiento
 
-@using (Html.BeginForm(null,null,FormMethod.Post, new {  @id = "frmDev", @enctype = "multipart/form-data" }))
+@using (Html.BeginForm(null,null,FormMethod.Post, new {  @id = "frmDD", @enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -54,7 +54,7 @@
         </div>
         <div class="col-xs-12 col-md-6">
             <div class="form-group">
-                <label>&nbsp;</label>
+                <label>Doc.Cargo</label>
                 @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })
             </div>
         </div>
@@ -62,9 +62,17 @@
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <div class="form-group">
-                <label>Unidad Ejecutora</label>                
-                <div id="cboUE"></div>
-                @Html.EditorFor(model => model.EntidadDestino, new { htmlAttributes = new { @class = "form-control", @style = "display:none;", @placeholder = "Ingresar otra UE" } })
+                @if (Model.IDTipoMov == 2)
+                {
+                    <label>Unidad Ejecutora</label>
+                }
+                else
+                {
+                    <label>CAC</label>
+                }
+                <div id="cboDD"></div>
+                @*@Html.EditorFor(model => model.EntidadDestino, new { htmlAttributes = new { @class = "form-control", @style = "display:none;", @placeholder = "Ingresar otra UE" } })*@
+                <input type="hidden" name="UndEjec_CAC" id="UndEjec_CAC" value="" />
             </div>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -96,9 +104,9 @@
 
 <script>  
     $("#btnGrabarDev").on("click", function () {
-        var _Data = new FormData(document.getElementById("frmDev"));
+        var _Data = new FormData(document.getElementById("frmDD"));
         $.ajax({
-            url: $urlReal + "Movimiento/DevCrear",
+            url: $urlReal + "Movimiento/DDCrear",
             //data: $("#frmDev").serialize(),
             data: _Data,
             type: 'POST',            
@@ -110,7 +118,7 @@
                 //console.log(result);
                 if (result.success == true) {
                     showNotification(result.message, notificationTypes.success, 2000);
-                    popupDevolucion.dxPopup("instance").hide();
+                    popupDD.dxPopup("instance").hide();
                     gridExpedientes.dxDataGrid("instance").refresh();
                 } else {
                     showNotification(result.message, notificationTypes.warning, 2000);
@@ -215,8 +223,9 @@
     var listado = new DevExpress.data.CustomStore({
         load: function (loadOptions) {
             var deferred = $.Deferred();
-            args = {};
-            args.Tipo = 1;
+            var args = {};
+            args.Tipo = @Model.IDTipoMov;
+            console.log(args);
             $.ajax({
                 url: $urlReal + "Expedientes/ListadoPersonas",
                 data: JSON.stringify(args),
@@ -240,24 +249,24 @@
 
     });
 
-    var cboUE = $("#cboUE").dxSelectBox({
+    var cboDD = $("#cboDD").dxSelectBox({
         dataSource: {
             store: listado
         },
         placeholder: "Seleccionar...",
         displayExpr: "Nombres",
         valueExpr: "Nombres",
-        searchEnabled: true,
+        //searchEnabled: true,
         onValueChanged: function (e) {
             var ide = e.value;
-            var UE = $("#EntidadDestino");
-            UE.css("display", "none");
-            if (ide == "OTRO") {
-                UE.css("display", "block");
-                UE.val("");
-            } else {
-                UE.val(ide);
-            }
+            var UndEjec_CAC = $("#UndEjec_CAC");
+            //UndEjec_CAC.css("display", "none");
+            /*if (ide == "OTRO") {
+                UndEjec_CAC.css("display", "block");
+                UndEjec_CAC.val("");
+            } else {*/
+                UndEjec_CAC.val(ide);
+            //}
         }
     });
 

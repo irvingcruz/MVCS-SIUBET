@@ -100,4 +100,14 @@ label {
     border-bottom: 2px solid #106ebe;
 }
 
+.dx-popup-title {
+    background-color: #428bca;
+    color: #ffffff;
+}
 
+.dx-popup-title .dx-closebutton .dx-icon {
+    color: #ffffff;
+}
+.dx-texteditor {
+    padding: 4px;
+}

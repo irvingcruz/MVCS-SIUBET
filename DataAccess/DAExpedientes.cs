@@ -117,7 +117,8 @@ namespace DataAccess
                         oExp.Responsable = dr["Responsable"].ToString();
                         oExp.NumeroCargo = dr["NumeroCargo"].ToString();
                         oExp.NombreFileCargo = dr["NombreFileCargo"].ToString();
-                        oExp.EntidadDestino = dr["EntidadDestino"].ToString();
+                        if (Convert.ToInt32(dr["IDTipoMov"]) == 4) { oExp.Ing_Evaluador = dr["EntidadDestino"].ToString(); }
+                        else { oExp.UndEjec_CAC = dr["EntidadDestino"].ToString(); }
                         oExp.Observaciones = dr["Observaciones"].ToString();
                         oExp.FechaFinal = dr["FechaFinal"].ToString();
                         oExp.Estado = dr["Estado"].ToString();
@@ -155,7 +156,7 @@ namespace DataAccess
                     {
                         BEPersona oUE = new BEPersona();
                         oUE.IDPersona = Convert.ToInt32(dr["ID"]);
-                        oUE.Nombres= dr["Nombres"].ToString();                       
+                        oUE.Nombres = dr["Nombres"].ToString().Trim();                       
                         listado.Add(oUE);
                     }
                 }
@@ -171,5 +172,38 @@ namespace DataAccess
             return listado;
         }
 
+        public List<BEExpediente> fnListarExpedientesEnRetorno(int IDMovimiento)
+        {
+            List<BEExpediente> listado = new List<BEExpediente>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spSUX_ListarExpedientesEnRetorno", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDMovimiento", IDMovimiento);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        BEExpediente oExp = new BEExpediente();
+                        oExp.Nro = Convert.ToInt32(dr["Nro"]);
+                        oExp.IDVersion = Convert.ToInt32(dr["IDVersion"]);
+                        oExp.Snip = Convert.ToInt32(dr["Snip"]);
+                        oExp.NumeroHT = dr["NumeroHT"].ToString();
+                        oExp.NVersion = dr["NVersion"].ToString();                        
+                        listado.Add(oExp);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return listado;
+        }
     }
 }

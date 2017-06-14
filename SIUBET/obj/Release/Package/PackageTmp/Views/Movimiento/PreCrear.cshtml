@@ -27,24 +27,30 @@
         </div>
         <div class="col-xs-12 col-md-6">
             <div class="form-group">
-                <label>&nbsp;</label>
-                @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })
+                @*<label>&nbsp;</label>
+                @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })*@
+                <label>Ingenieros/Otros</label>
+                <div id="cboIng"></div>
+                <input type="hidden" name="Ing_Evaluador" id="Ing_Evaluador" value="" />
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12 col-md-5">
-            <div class="form-group">
-                <label>Ingenieros/Otros</label>
-                @Html.EditorFor(model => model.EntidadDestino, new { htmlAttributes = new { @class = "form-control" } })
-            </div>
-        </div>
         <div class="col-xs-12 col-md-7">
             <div class="form-group">
+                @*<label>Ingenieros/Otros</label>
+                <div id="cboIng"></div>
+                <input type="hidden" name="Ing_Evaluador" id="Ing_Evaluador" value="" />*@
                 <label>Observaciones</label>
                 @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @maxlength = "100" })
             </div>
         </div>
+        @*<div class="col-xs-12 col-md-7">
+            <div class="form-group">
+                <label>Observaciones</label>
+                @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @maxlength = "100" })
+            </div>
+        </div>*@
     </div>
     <div class="row">
         <div class="col-xs-12">
@@ -183,6 +189,51 @@
         dataSource: {
             store: listadoExpedientes
         },
+    });
+
+    var listado = new DevExpress.data.CustomStore({
+        load: function (loadOptions) {
+            var deferred = $.Deferred();
+            var args = {};            
+            args.Tipo = @Model.IDTipoMov;
+            console.log(args);
+            $.ajax({
+                url: $urlReal + "Expedientes/ListadoPersonas",
+                data: JSON.stringify(args),
+                type: 'POST',
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    console.log(result)
+                    $stateSearch = false;
+                    //showNotification(result.message, notificationTypes.success, 2000);
+                    deferred.resolve(result.items3, { totalCount: result.totalRowsFilter });
+                },
+                error: function () {
+                    deferred.reject($infoTextError);
+                },
+                timeout: 500000
+            });
+
+            return deferred.promise();
+        },
+
+    });
+
+    var cboIng = $("#cboIng").dxSelectBox({
+        dataSource: {
+            store: listado
+        },
+        placeholder: "Seleccionar...",
+        displayExpr: "Nombres",
+        valueExpr: "Nombres",
+        searchEnabled: true,
+        onValueChanged: function (e) {
+            var ide = e.value;
+            var Ing_Evaluador = $("#Ing_Evaluador");
+            //Ing_Evaluador.css("display", "none");
+            Ing_Evaluador.val(ide);
+        }
     });
 
 </script>

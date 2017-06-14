@@ -16,18 +16,20 @@ namespace SIUBET.Controllers
         private string vMsgSuccess = "El registró se guardó correctamente.";
         private string vMsgFail = "Error al tratar de guadar el registro.";
         private string vMsgThrow = "Error inesperado al procesar el registro.";
-             
-        public ActionResult DevCrear()
+        private int iMaxSizeFile = 512000; //500KB - 0.5MB
+        private string vPDF = "pdf";
+
+        public ActionResult DDCrear(int id)
         {
             ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarResponsables(), "IDResponsable", "Descripcion");
-            BEMovimiento oDevolucion = new BEMovimiento();
-            oDevolucion.FechaMov = DateTime.Now.ToShortDateString();
-            oDevolucion.FechaEmision = oDevolucion.FechaMov;
-            oDevolucion.IDTipoMov = 2; //Devolución        
-            return PartialView(oDevolucion);
+            BEMovimiento oDD = new BEMovimiento();
+            oDD.FechaMov = DateTime.Now.ToShortDateString();
+            oDD.FechaEmision = oDD.FechaMov;
+            oDD.IDTipoMov = id; //[2]Devolución [5]Derivación
+            return PartialView(oDD);
         }
         [HttpPost]
-        public ActionResult DevCrear(BEMovimiento oDevolucion)
+        public ActionResult DDCrear(BEMovimiento oDD)
         {
 
             if (!Request.IsAjaxRequest()) return null;
@@ -36,36 +38,55 @@ namespace SIUBET.Controllers
             bool rpta = false;
             try
             {
-                if (oDevolucion.NumeroCargo == null || oDevolucion.NumeroCargo.Trim().Length <= 0)
+                if (oDD.NumeroCargo == null || oDD.NumeroCargo.Trim().Length <= 0)
                 {
                     result.message = "Ingrese el número de cargo";
                     goto Terminar;
                 }
-                if (oDevolucion.EntidadDestino == null || oDevolucion.EntidadDestino.Trim().Length <= 0)
+                if (oDD.UndEjec_CAC == null || oDD.UndEjec_CAC.Trim().Length <= 0)
                 {
-                    result.message = "Seleccione ó Ingrese la Unidad Ejecutora";
+                    result.message = oDD.IDTipoMov == 2 ? "Seleccione ó Ingrese la Unidad Ejecutora" : "Seleccione un CAC";
                     goto Terminar;
                 }
-                if (oDevolucion.FileEmision == null)
+                if (oDD.FileEmision == null)
                 {
                     result.message = "Debe anexar un documento para la Emisión";
                     goto Terminar;
                 }
-                if (oDevolucion.FileCargo == null)
+
+                if (oDD.FileCargo == null)
                 {
                     result.message = "Debe anexar un documento para el cargo";
                     goto Terminar;
                 }
 
-                oDevolucion.ExtensionFile = Path.GetExtension(oDevolucion.FileEmision.FileName);
-                rpta = new BLMovimientos().fnInsertarMovDevolucion(oDevolucion);
+                if (oDD.FileEmision.ContentLength > iMaxSizeFile || oDD.FileCargo.ContentLength > iMaxSizeFile)
+                {
+                    var _fileName = "";
+                    if (oDD.FileEmision.ContentLength > iMaxSizeFile) _fileName = oDD.FileEmision.FileName;
+                    if (oDD.FileCargo.ContentLength > iMaxSizeFile) _fileName = oDD.FileCargo.FileName;
+                    result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + _fileName + ")";
+                    goto Terminar;
+                }
+
+                var supportedTypes = new[] { vPDF };
+                var fileExtEmision = System.IO.Path.GetExtension(oDD.FileEmision.FileName).Substring(1);
+                var fileExtCargo = System.IO.Path.GetExtension(oDD.FileCargo.FileName).Substring(1);
+                if (!supportedTypes.Contains(fileExtEmision) || !supportedTypes.Contains(fileExtCargo))
+                {
+                    result.message = "Solo esta permitido documentos PDF.";
+                    goto Terminar;
+                }
+
+                oDD.ExtensionFile = Path.GetExtension(oDD.FileEmision.FileName);
+                rpta = new BLMovimientos().fnInsertarMovDD(oDD);
 
                 if (rpta)
                 {
-                    string adjuntoFileEmision = oDevolucion.Archivo + "-E" + Path.GetExtension(oDevolucion.FileEmision.FileName);
-                    string adjuntoFileCargo = oDevolucion.Archivo + "-S" + Path.GetExtension(oDevolucion.FileCargo.FileName);
-                    oDevolucion.FileEmision.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileEmision));
-                    oDevolucion.FileCargo.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileCargo));
+                    string adjuntoFileEmision = oDD.Archivo + "-E" + Path.GetExtension(oDD.FileEmision.FileName);
+                    string adjuntoFileCargo = oDD.Archivo + "-S" + Path.GetExtension(oDD.FileCargo.FileName);
+                    oDD.FileEmision.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileEmision));
+                    oDD.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
                     result.message = vMsgSuccess;
                 }
                 else
@@ -84,20 +105,20 @@ namespace SIUBET.Controllers
             //result.message = message;
             return new JsonResult { Data = result };
         }
-        public ActionResult DevIndex()
+        public ActionResult DDIndex()
         {
             return View();
         }                
-        public ActionResult DevRecepcionar(int id)
+        public ActionResult DDRecepcionar(int id)
         {
-            BEMovimiento oDevolucion = new BEMovimiento();
-            oDevolucion.IDMovimiento = id;
-            oDevolucion.FechaFinal = DateTime.Now.ToShortDateString();
+            BEMovimiento oDD = new BEMovimiento();
+            oDD.IDMovimiento = id;
+            oDD.FechaFinal = DateTime.Now.ToShortDateString();
 
-            return PartialView(oDevolucion);
+            return PartialView(oDD);
         }
         [HttpPost]
-        public ActionResult DevRecepcionar(BEMovimiento oDevolucion)
+        public ActionResult DDRecepcionar(BEMovimiento oDD)
         {
             if (!Request.IsAjaxRequest()) return null;
 
@@ -106,21 +127,21 @@ namespace SIUBET.Controllers
             //string message = "";
             try
             {
-                if (oDevolucion.FileFinal == null) {
+                if (oDD.FileFinal == null) {
                     result.message = "Debe anexar un documento.";
                     goto Terminar;
                 }
 
-                oDevolucion.ExtensionFile = Path.GetExtension(oDevolucion.FileFinal.FileName);
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDev(oDevolucion);
+                oDD.ExtensionFile = Path.GetExtension(oDD.FileFinal.FileName);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oDD);
 
                 if (rpta)
                 {
-                    var file = Path.Combine(HttpContext.Server.MapPath("~/Uploads/D/"), oDevolucion.Archivo + "-S" + oDevolucion.ExtensionFile);
+                    var file = Path.Combine(HttpContext.Server.MapPath("~/Uploads/"), oDD.Archivo + "-S" + oDD.ExtensionFile);
                     if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
 
-                    string adjuntoFileFinal = oDevolucion.Archivo + "-R" + Path.GetExtension(oDevolucion.FileFinal.FileName);                                        
-                    oDevolucion.FileFinal.SaveAs(Server.MapPath("~/Uploads/D/" + adjuntoFileFinal));
+                    string adjuntoFileFinal = oDD.Archivo + "-R" + Path.GetExtension(oDD.FileFinal.FileName);
+                    oDD.FileFinal.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileFinal));
                     result.message = vMsgSuccess;
                 }
                 else
@@ -182,24 +203,26 @@ namespace SIUBET.Controllers
             bool rpta = false;
             try
             {
-                if (oPrestamo.EntidadDestino == null || oPrestamo.EntidadDestino.Trim().Length <= 0)
+                if (oPrestamo.Ing_Evaluador == null || oPrestamo.Ing_Evaluador.Trim().Length <= 0)
                 {
                     result.message = "Seleccione ó Ingrese el Ingeniero/Otros";
                     goto Terminar;
                 }
-                if (oPrestamo.FileCargo == null)
-                {
-                    result.message = "Debe anexar un documento de cargo.";
-                    goto Terminar;
-                }
-
-                oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
+                //if (oPrestamo.FileCargo == null)
+                //{
+                //    result.message = "Debe anexar un documento de cargo.";
+                //    goto Terminar;
+                //}
+                if (oPrestamo.FileCargo != null) oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
                 rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo);
 
                 if (rpta)
                 {
-                    string adjuntoFileCargo = oPrestamo.Archivo + "-S" + Path.GetExtension(oPrestamo.FileCargo.FileName);
-                    oPrestamo.FileCargo.SaveAs(Server.MapPath("~/Uploads/P/" + adjuntoFileCargo));
+                    if (oPrestamo.FileCargo != null)
+                    {
+                        string adjuntoFileCargo = oPrestamo.Archivo + "-S" + Path.GetExtension(oPrestamo.FileCargo.FileName);
+                        oPrestamo.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
+                    }
                     result.message = vMsgSuccess;
                 }
                 else
@@ -234,41 +257,59 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            string message = "";
             try
             {
                 if (oPrestamo.FileFinal == null)
                 {
                     result.message = "Debe anexar un documento de cargo";
                     goto Terminar;
-                }                                
+                }
+
+                if (oPrestamo.ET_selected_P == null || oPrestamo.ET_selected_P.Length == 0) {
+                    result.message = "Debe seleccionar uno o más registros.";
+                    goto Terminar;
+                }
+
+                if (oPrestamo.FileFinal.ContentLength > iMaxSizeFile)
+                {                    
+                    result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + oPrestamo.FileFinal.FileName + ")";
+                    goto Terminar;
+                }
+
+                var supportedTypes = new[] { vPDF };
+                var fileExtEmision = System.IO.Path.GetExtension(oPrestamo.FileFinal.FileName).Substring(1);                
+                if (!supportedTypes.Contains(fileExtEmision))
+                {
+                    result.message = "Solo esta permitido documentos PDF.";
+                    goto Terminar;
+                }
 
                 oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileFinal.FileName);
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDev(oPrestamo);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oPrestamo);
 
                 if (rpta)
                 {
-                    var file = Path.Combine(HttpContext.Server.MapPath("~/Uploads/P/"), oPrestamo.Archivo + "-S" + oPrestamo.ExtensionFile);
+                    var file = Path.Combine(HttpContext.Server.MapPath("~/Uploads/"), oPrestamo.Archivo + "-S" + oPrestamo.ExtensionFile);
                     if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
 
                     string adjuntoFileFinal = oPrestamo.Archivo + "-R" + Path.GetExtension(oPrestamo.FileFinal.FileName); ;
-                    oPrestamo.FileFinal.SaveAs(Server.MapPath("~/Uploads/P/" + adjuntoFileFinal));
-                    message = vMsgSuccess;
+                    oPrestamo.FileFinal.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileFinal));
+                    result.message = vMsgSuccess;
                 }
                 else
                 {
-                    message = vMsgFail;
+                    result.message = vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                message = vMsgThrow;
+                result.message = vMsgThrow;
             }
             Terminar:
             result.items = null;
             result.success = rpta;
-            result.message = message;
+            //result.message = message;
             return new JsonResult { Data = result };
         }
         [HttpPost]
@@ -277,7 +318,6 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            string message = "";
             try
             {
                 BEMovimiento oMov = new BEMovimiento(){ IDMovimiento = IDMovimiento, Motivo = vMotivo };
@@ -285,21 +325,21 @@ namespace SIUBET.Controllers
                 switch (IDTipoMov)
                 {
                     case 2:
-                        message = rpta ? "La Devolución se anuló correctamente" : "No se puede anular la devolución."; ;
+                        result.message = rpta ? "La Devolución se anuló correctamente" : "No se puede anular la devolución.";
                         break;
                     case 4:
-                        message = rpta ? "El Préstamo se anuló correctamente" : "No se puede anular el préstamo.";
+                        result.message = rpta ? "El Préstamo se anuló correctamente" : "No se puede anular el préstamo.";
                         break;
                 }                                       
                 
             }
             catch (Exception)
             {
-                message = vMsgThrow;
+                result.message = vMsgThrow;
             }
             result.items = null;
             result.success = rpta;
-            result.message = message;
+            //result.message = message;
             return new JsonResult { Data = result };
         }
 

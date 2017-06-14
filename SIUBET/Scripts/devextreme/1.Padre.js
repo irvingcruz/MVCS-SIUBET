@@ -19,7 +19,10 @@
 function openPopupAnular(options) {
     console.log(options);
     IDTipoMov = options.IDTipoMov;
-    var _title = IDTipoMov == 2 ? "Anular Devolución" : "Anular Préstamo";
+    var _title = "";
+    if (IDTipoMov == 2) _title = "Anular Devolución";
+    if (IDTipoMov == 4) _title = "Anular Préstamo";
+    if (IDTipoMov == 5) _title = "Anular Derivación";    
     var popupAnular = $("#popup-Anular").dxPopup({
         showTitle: true,
         title: _title,
@@ -49,7 +52,9 @@ function openPopupAnular(options) {
                 return;
             }
             var _message = "<h6>¿Seguro que desea anular ";
-            _message += IDTipoMov == 2 ? "la devolución" : "el préstamo";
+            if (IDTipoMov == 2) _message += "la devolución";
+            if (IDTipoMov == 4) _message += "el préstamo";
+            if (IDTipoMov == 5) _message += "la derivación";
             _message += "?<h6/>";
             var result = DevExpress.ui.dialog.custom({
                 title: "Confirmar",
@@ -157,13 +162,16 @@ function fnListarMovimientos(pageIndex, IDTipo, gridMovs) {
 
 function openPopupRetornaRecepciona(options) {
     var movimiento = options;
-    _url = movimiento.IDTipoMov == 2 ? "DevRecepcionar/" : "PreRetornar/";
-    _title = movimiento.IDTipoMov == 2 ? "Recepcionar Devolución" : "Retornar Préstamo";
+    _url = movimiento.IDTipoMov != 4 ? "DDRecepcionar/" : "PreRetornar/";
+    if (movimiento.IDTipoMov == 2) _title = "Recepcionar Devolución";
+    if (movimiento.IDTipoMov == 4) _title = "Retornar Préstamo";
+    if (movimiento.IDTipoMov == 5) _title = "Recepcionar Derivación";
+    _width = movimiento.IDTipoMov == 4 ? 500 : 400;
     RetornaRecepciona = $("#popup-RetornaRecepciona").dxPopup({
         showTitle: true,
         title: _title,
-        width: 400,
-        height: 350,
+        width: _width,
+        height: "auto",
         contentTemplate: function () {
             var $pageContent = $("<span />");
             return $pageContent.load($urlReal + 'Movimiento/' + _url + movimiento.IDMovimiento);

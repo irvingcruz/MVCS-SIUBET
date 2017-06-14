@@ -17,29 +17,29 @@ namespace DataAccess
             this.oCon = _oCon;
         }
 
-        public bool fnInsertarMovDevolucion(BEMovimiento oDevolucion) {
+        public bool fnInsertarMovDD(BEMovimiento oDD) {
             bool rpta = false;
             try
             {
-                SqlCommand cmd = new SqlCommand("spiSUX_InsertarMovDevolucion", oCon);
+                SqlCommand cmd = new SqlCommand("spiSUX_InsertarMovDD", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@FechaEmision", oDevolucion.FechaEmision);
-                cmd.Parameters.AddWithValue("@FechaMov", oDevolucion.FechaMov);
-                cmd.Parameters.AddWithValue("@IDTipoMov", oDevolucion.IDTipoMov);
-                cmd.Parameters.AddWithValue("@IDResponsable", oDevolucion.IDResponsable);
-                cmd.Parameters.AddWithValue("@NumeroCargo", oDevolucion.NumeroCargo);                
-                cmd.Parameters.AddWithValue("@EntidadDestino", oDevolucion.EntidadDestino);
-                cmd.Parameters.AddWithValue("@Observaciones", oDevolucion.Observaciones);
-                cmd.Parameters.AddWithValue("@IdsExpedientes", oDevolucion.ET_selected_D);
-                cmd.Parameters.AddWithValue("@ExtensionFile", oDevolucion.ExtensionFile);
+                cmd.Parameters.AddWithValue("@FechaEmision", oDD.FechaEmision);
+                cmd.Parameters.AddWithValue("@FechaMov", oDD.FechaMov);
+                cmd.Parameters.AddWithValue("@IDTipoMov", oDD.IDTipoMov);
+                cmd.Parameters.AddWithValue("@IDResponsable", oDD.IDResponsable);
+                cmd.Parameters.AddWithValue("@NumeroCargo", oDD.NumeroCargo);                
+                cmd.Parameters.AddWithValue("@UndEjec_CAC", oDD.UndEjec_CAC);
+                cmd.Parameters.AddWithValue("@Observaciones", oDD.Observaciones);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oDD.ET_selected_D);
+                cmd.Parameters.AddWithValue("@ExtensionFile", oDD.ExtensionFile);
                 cmd.Parameters.AddWithValue("@Usuario", "irving");
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
-                cmd.Parameters.AddWithValue("@Archivo", "0000-0000").Direction = ParameterDirection.InputOutput;
+                cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
                 
                 cmd.ExecuteNonQuery();
                 rpta = Convert.ToBoolean(cmd.Parameters["@rpta"].Value);
-                oDevolucion.Archivo = cmd.Parameters["@Archivo"].Value.ToString();
+                oDD.Archivo = cmd.Parameters["@Archivo"].Value.ToString();
 
             }
             catch (Exception e)
@@ -109,12 +109,19 @@ namespace DataAccess
                         oMov.Responsable = dr["Responsable"].ToString();
                         oMov.NumeroCargo = dr["NumeroCargo"].ToString();
                         oMov.NombreFileCargo = dr["NombreFileCargo"].ToString();
-                        oMov.EntidadDestino = dr["EntidadDestino"].ToString();
+                        if (oMov.IDTipoMov == 4)
+                        {
+                            oMov.Ing_Evaluador = dr["EntidadDestino"].ToString();
+                        }
+                        else {
+                            oMov.UndEjec_CAC = dr["EntidadDestino"].ToString();
+                        }
                         oMov.FechaFinal = dr["FechaFinal"].ToString();
                         oMov.NombreFileFinal= dr["NombreFileFinal"].ToString();
                         oMov.Plazo = Convert.ToInt32(dr["Plazo"]);
                         oMov.FechaRetornoEstimada = dr["FechaRetornoEstimada"].ToString();
                         oMov.Estado = dr["Estado"].ToString();
+                        oMov.Motivo = dr["Motivo"].ToString();
                         oMov.Activo = Convert.ToBoolean(dr["Activo"]);
                         listado.Add(oMov);
                     }
@@ -131,24 +138,25 @@ namespace DataAccess
             return listado;
         }
 
-        public bool fnRetornaPre_RecepcionaDev(BEMovimiento oDevolucion)
+        public bool fnRetornaPre_RecepcionaDD(BEMovimiento oMov)
         {
             bool rpta = false;
             try
             {
-                SqlCommand cmd = new SqlCommand("spuSUX_RetornaPre_RecepcionaDev", oCon);
+                SqlCommand cmd = new SqlCommand("spuSUX_RetornaPre_RecepcionaDD", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@IDMovimiento", oDevolucion.IDMovimiento);
-                cmd.Parameters.AddWithValue("@FechaFinal", oDevolucion.FechaFinal);
-                cmd.Parameters.AddWithValue("@ExtensionFile", oDevolucion.ExtensionFile);
+                cmd.Parameters.AddWithValue("@IDMovimiento", oMov.IDMovimiento);
+                cmd.Parameters.AddWithValue("@FechaFinal", oMov.FechaFinal);
+                cmd.Parameters.AddWithValue("@ExtensionFile", oMov.ExtensionFile);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oMov.ET_selected_P);
                 cmd.Parameters.AddWithValue("@Usuario", "irving");
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
-                cmd.Parameters.AddWithValue("@Archivo", "0000-0000").Direction = ParameterDirection.InputOutput;
+                cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
 
                 cmd.ExecuteNonQuery();
                 rpta = Convert.ToBoolean(cmd.Parameters["@rpta"].Value);
-                oDevolucion.Archivo = cmd.Parameters["@Archivo"].Value.ToString();
+                oMov.Archivo = cmd.Parameters["@Archivo"].Value.ToString();
             }
             catch (Exception e)
             {
@@ -170,13 +178,13 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@FechaMov", oPrestamo.FechaMov);
                 cmd.Parameters.AddWithValue("@IDTipoMov", oPrestamo.IDTipoMov);
                 cmd.Parameters.AddWithValue("@Plazo", oPrestamo.Plazo);                
-                cmd.Parameters.AddWithValue("@EntidadDestino", oPrestamo.EntidadDestino);
+                cmd.Parameters.AddWithValue("@Ing_Evaluador", oPrestamo.Ing_Evaluador);
                 cmd.Parameters.AddWithValue("@Observaciones", oPrestamo.Observaciones);                
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected_P);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oPrestamo.ExtensionFile);
                 cmd.Parameters.AddWithValue("@Usuario", "irving");
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
-                cmd.Parameters.AddWithValue("@Archivo", "0000-0000").Direction = ParameterDirection.InputOutput;
+                cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
 
                 cmd.ExecuteNonQuery();
@@ -195,15 +203,15 @@ namespace DataAccess
             return rpta;
         }
 
-        public bool fnAnularMovimiento(BEMovimiento oDevolucion)
+        public bool fnAnularMovimiento(BEMovimiento oMov)
         {
             bool rpta = false;
             try
             {
                 SqlCommand cmd = new SqlCommand("spuSUX_AnularMovimiento", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@IDMovimiento", oDevolucion.IDMovimiento);
-                cmd.Parameters.AddWithValue("@Motivo", oDevolucion.Motivo);
+                cmd.Parameters.AddWithValue("@IDMovimiento", oMov.IDMovimiento);
+                cmd.Parameters.AddWithValue("@Motivo", oMov.Motivo);
                 cmd.Parameters.AddWithValue("@Usuario", "irving");
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 oCon.Open();

@@ -98,5 +98,24 @@ namespace SIUBET.Controllers
 
             return new JsonResult { Data = result };
         }
+
+        [HttpPost]
+        public JsonResult ListadoExpedientesEnRetorno(int IDMovimiento, int pageNumber, int pageSize)
+        {
+
+            if (!Request.IsAjaxRequest()) return null;
+            ObjetoJson result = new ObjetoJson();
+
+            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientesEnRetorno(IDMovimiento, pageNumber, pageSize);
+
+            result.items = datosResult;
+            result.totalRows = datosResult.Count();
+            result.totalRowsFilter = result.totalRows;
+            result.success = true;
+            result.message = result.totalRowsFilter + " registros para retorno";
+
+
+            return new JsonResult { Data = result };
+        }
     }
 }

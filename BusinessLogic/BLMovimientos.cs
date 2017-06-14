@@ -12,13 +12,13 @@ namespace BusinessLogic
     public class BLMovimientos
     {
         private SqlConnection oCon;
-        public bool fnInsertarMovDevolucion(BEMovimiento oDevolucion)
+        public bool fnInsertarMovDD(BEMovimiento oDD)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnInsertarMovDevolucion(oDevolucion);
+                return obj.fnInsertarMovDD(oDD);
             }
             catch (Exception)
             {
@@ -58,13 +58,13 @@ namespace BusinessLogic
                 throw;
             }
         }
-        public bool fnRetornaPre_RecepcionaDev(BEMovimiento oDevolucion)
+        public bool fnRetornaPre_RecepcionaDD(BEMovimiento oMov)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnRetornaPre_RecepcionaDev(oDevolucion);
+                return obj.fnRetornaPre_RecepcionaDD(oMov);
             }
             catch (Exception)
             {
