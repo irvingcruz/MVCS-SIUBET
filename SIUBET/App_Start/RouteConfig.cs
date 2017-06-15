@@ -13,6 +13,10 @@ namespace SIUBET
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            routes.MapRoute("Movimiento",
+                "movimiento/precrear/{ets}",
+                new { controller = "Movimiento", action = "PreCrear", ets = "" });
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

@@ -9,6 +9,9 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+using Excel = Microsoft.Office.Interop.Excel;
+
+
 namespace SIUBET.Controllers
 {
     public class MovimientoController : Controller
@@ -185,13 +188,20 @@ namespace SIUBET.Controllers
         {
             return View();
         }
-        public ActionResult PreCrear()
+        public ActionResult PreCrear(string ets) //ExpdientesTécnicos (1|2|..|n)
         {            
-            BEMovimiento oDevolucion = new BEMovimiento();
-            oDevolucion.FechaMov = DateTime.Now.ToShortDateString();
-            oDevolucion.Plazo = 15;
-            oDevolucion.IDTipoMov = 4; //Préstamos        
-            return PartialView(oDevolucion);
+            BEMovimiento oPrestamo = new BEMovimiento();
+            oPrestamo.ET_selected_P = ets;
+            oPrestamo.FechaMov = DateTime.Now.ToShortDateString();
+            oPrestamo.FechaEmision = oPrestamo.FechaMov;
+            oPrestamo.Plazo = 15;
+            oPrestamo.IDTipoMov = 4; //Préstamos        
+            return PartialView(oPrestamo);
+        }
+        public ActionResult PreEditar(int id) {
+            BEMovimiento oPrestamo = new BEMovimiento();
+            oPrestamo = new BLMovimientos().fnObtenerMovimiento(id);
+            return PartialView("PreCrear", oPrestamo);
         }
         [HttpPost]
         public ActionResult PreCrear(BEMovimiento oPrestamo)
@@ -205,15 +215,35 @@ namespace SIUBET.Controllers
             {
                 if (oPrestamo.Ing_Evaluador == null || oPrestamo.Ing_Evaluador.Trim().Length <= 0)
                 {
-                    result.message = "Seleccione ó Ingrese el Ingeniero/Otros";
+                    result.message = "Ingrese el Ingeniero/Otros";
                     goto Terminar;
                 }
-                //if (oPrestamo.FileCargo == null)
-                //{
-                //    result.message = "Debe anexar un documento de cargo.";
-                //    goto Terminar;
-                //}
-                if (oPrestamo.FileCargo != null) oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
+
+                if(oPrestamo.IDMovimiento > 0)
+                {
+                    if (oPrestamo.FileCargo == null)
+                    {
+                        result.message = "Debe anexar un documento de cargo.";
+                        goto Terminar;
+                    }
+
+                    if (oPrestamo.FileCargo.ContentLength > iMaxSizeFile)
+                    {
+                        result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + oPrestamo.FileCargo.FileName + ")";
+                        goto Terminar;
+                    }
+
+                    var supportedTypes = new[] { vPDF };
+                    var fileExtCargo = System.IO.Path.GetExtension(oPrestamo.FileCargo.FileName).Substring(1);
+                    if (!supportedTypes.Contains(fileExtCargo))
+                    {
+                        result.message = "Solo esta permitido documentos PDF.";
+                        goto Terminar;
+                    }
+
+                    oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
+                }
+               
                 rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo);
 
                 if (rpta)
@@ -340,6 +370,155 @@ namespace SIUBET.Controllers
             result.items = null;
             result.success = rpta;
             //result.message = message;
+            return new JsonResult { Data = result };
+        }
+
+        public ActionResult PrePrintCargo(int IDMovimiento) {
+            ObjetoJson result = new ObjetoJson();
+            bool rpta = false;
+            BEMovimiento oRpt = new BEMovimiento();
+            oRpt = new BLMovimientos().fnReporteCargoPrestamos(IDMovimiento);
+
+            if (oRpt == null) {
+                result.message = "No se encontraron datos para el cargo.";
+                goto Terminar;
+            }
+
+            Excel.Application oXL;
+            Excel.Workbook oWB;
+            Excel.Worksheet oSheet;
+            
+            oXL = new Excel.Application();
+            //oXL.Visible = true;
+
+            oWB = oXL.Workbooks.Add();
+            oSheet = (Excel.Worksheet)oWB.Worksheets.get_Item(1);
+            oSheet.Name = "PrestamoCargo";
+
+            oSheet.Range["E3", "K3"].MergeCells = true;
+            oSheet.Range["E4", "K4"].MergeCells = true;
+            oSheet.Cells[3, 5] = "AREA DE ADMINISTRACIÓN DOCUMENTARIA E INFORMÁTICA";
+            oSheet.Cells[4, 5] = "FORMULARIO DE SERVICIO ARCHIVÍSTICO N°" + oRpt.Correlativo;
+            
+            oSheet.Cells[7, 9] = "FECHA";
+            oSheet.Cells[7, 10] = oRpt.FechaMov;
+
+            oSheet.Range["C8", "C8"].Font.Bold = true;
+            oSheet.Cells[8, 3] = "DATOS DEL SOLICITANTE";
+            oSheet.Cells[9, 3] = "NOMBRES Y APELLIDOS";
+            oSheet.Cells[10, 3] = "UNIDAD ÓRGANICA";
+            oSheet.Cells[11, 3] = "SEDE";
+            oSheet.Cells[12, 3] = "CORREO";            
+
+            oSheet.Cells[9, 6] = oRpt.Ing_Evaluador;
+            oSheet.Cells[10, 6] = "";
+            oSheet.Cells[11, 6] = "OLAECHEA";
+            oSheet.Cells[12, 6] = oRpt.Correo;
+
+            oSheet.Range["C9", "K12"].BorderAround(Excel.XlLineStyle.xlContinuous);
+
+            oSheet.Cells[14, 3] = "TIPO DEL SERVICIO";
+            oSheet.Cells[14, 6] = "";
+
+            oSheet.Cells[16, 3] = "ITEM";
+            oSheet.Cells[16, 4] = "SNIP";
+            oSheet.Cells[16, 5] = "DESCRIPCIÓN DEL PIP";
+            oSheet.Cells[16, 6] = "HT";
+            oSheet.Cells[16, 7] = "FECHA HT";
+            oSheet.Cells[16, 8] = "DOCUMENTO DE INGRESO";
+            oSheet.Cells[16, 9] = "UNIDAD DE CONSERVACIÓN";
+            oSheet.Cells[16, 10] = "FOLIOS";
+            oSheet.Cells[16, 11] = "CD";
+
+            oSheet.Range["C16", "K16"].Font.Bold = true;            
+            int item = 16;            
+            foreach (BEExpediente exp in oRpt.ListadoETs)
+            {
+                item++;
+                oSheet.Cells[item, 3] = exp.Nro;
+                oSheet.Cells[item, 4] = exp.Snip;
+                oSheet.Cells[item, 5] = exp.NombreProyecto;
+                oSheet.Cells[item, 6] = exp.NumeroHT;
+                oSheet.Cells[item, 7] = exp.FechaOficio;
+                oSheet.Cells[item, 8] = exp.NVersion;
+                oSheet.Cells[item, 9] = exp.UnidadConservacion;
+                oSheet.Cells[item, 10] = exp.Folios;
+                oSheet.Cells[item, 11] = exp.CDs;
+            }
+            oSheet.Range["C16", "K" + item.ToString()].Borders.Weight = Excel.XlBorderWeight.xlThin;
+
+            oSheet.Range["C16", "K" + item.ToString()].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            oSheet.Range["C16", "K" + item.ToString()].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+            //oSheet.Range["E17", "E" + item.ToString()].WrapText = true;            
+            oSheet.Range["H16", "K" + item.ToString()].WrapText = true;
+            
+
+            item++;
+            oSheet.Cells[item, 3] = "OBSERVACIONES";
+            oSheet.Range["E" + item.ToString(), "K" + (item+1).ToString()].MergeCells = true;
+            oSheet.Range["E" + item.ToString(), "K" + (item + 1).ToString()].VerticalAlignment = Excel.XlVAlign.xlVAlignTop;
+            oSheet.Cells[item, 5] = oRpt.Observaciones;
+            
+            item = item + 4;
+            int itemFirmas = item;
+            oSheet.Range["H" + item.ToString(), "J" + item.ToString()].MergeCells = true;
+            oSheet.Cells[item, 5] = "__________________________";
+            oSheet.Cells[item, 8] = "___________________________________________";
+
+            item++;
+            oSheet.Range["H" + item.ToString(), "J" + item.ToString()].MergeCells = true;
+            oSheet.Cells[item, 5] = "RESPONSABLE DE PRÉSTAMO";
+            oSheet.Cells[item, 8] = "CONFORMIDAD DE RECEPCIÓN DEL SOLICITANTE";
+
+            item = item + 2;
+            oSheet.Range["F" + item.ToString(), "G" + item.ToString()].MergeCells = true;
+            oSheet.Cells[item, 6] = "_____________________________";
+
+            item++;
+            oSheet.Range["F" + item.ToString(), "G" + item.ToString()].MergeCells = true;
+            oSheet.Cells[item, 6] = "CONFORMIDAD DE DEVOLUCIÓN";
+
+            item++;           
+
+            oSheet.Range["A1", "K" + item.ToString()].Font.Name = "Tahoma";
+            oSheet.Range["A1", "K" + item.ToString()].Font.Size = 10;
+            oSheet.Range["A3", "K4"].Font.Size = 14;
+            oSheet.Range["A17", "K" + item.ToString()].Font.Size = 9;
+            oSheet.Range["A3", "K4"].Font.Bold = true;
+            oSheet.Range["E3","K4"].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            oSheet.Range["C" + itemFirmas.ToString(), "K" + item.ToString()].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+            oSheet.Range["B2", "L" + item.ToString()].BorderAround(Excel.XlLineStyle.xlContinuous);
+
+            oSheet.Cells[1, 1].ColumnWidth = 1;
+            oSheet.Cells[1, 2].ColumnWidth = 1;
+            oSheet.Cells[1, 3].ColumnWidth = 8;
+            oSheet.Cells[1, 4].ColumnWidth = 10;
+            oSheet.Cells[1, 5].ColumnWidth = 50;
+            oSheet.Cells[1, 6].ColumnWidth = 18;
+            oSheet.Cells[1, 7].ColumnWidth = 12;
+            oSheet.Cells[1, 8].ColumnWidth = 30;
+            oSheet.Cells[1, 9].ColumnWidth = 20;
+            oSheet.Cells[1, 10].ColumnWidth = 11;
+            oSheet.Cells[1, 11].ColumnWidth = 11;
+            oSheet.Cells[1, 12].ColumnWidth = 1;
+
+            var _print = oSheet.PageSetup;
+            _print.Zoom = false;
+            _print.FitToPagesWide = 1;
+            _print.Orientation = Excel.XlPageOrientation.xlLandscape;
+
+            //oSheet.Range["B2:L" + item.ToString()].PrintOut();
+
+            oXL.Visible = true;
+            oXL.UserControl = true;
+
+            rpta = true;
+            result.message = "Documento de cargo generado correctamente.";
+
+            Terminar:
+            result.success = rpta;
+            //result.message = "Exportando a Excel";
             return new JsonResult { Data = result };
         }
 

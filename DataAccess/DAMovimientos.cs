@@ -175,6 +175,8 @@ namespace DataAccess
             {
                 SqlCommand cmd = new SqlCommand("spiSUX_InsertarMovPrestamo", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDMovimiento", oPrestamo.IDMovimiento);
+                cmd.Parameters.AddWithValue("@FechaSol", oPrestamo.FechaEmision);                
                 cmd.Parameters.AddWithValue("@FechaMov", oPrestamo.FechaMov);
                 cmd.Parameters.AddWithValue("@IDTipoMov", oPrestamo.IDTipoMov);
                 cmd.Parameters.AddWithValue("@Plazo", oPrestamo.Plazo);                
@@ -229,6 +231,82 @@ namespace DataAccess
                 oCon.Close();
             }
             return rpta;
+        }
+
+        public BEMovimiento fnObtenerMovimiento(int IDMovimiento) {
+            BEMovimiento oMov = new BEMovimiento();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spSUX_ObtenerMovimiento", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDMovimiento", IDMovimiento);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        oMov = new BEMovimiento();
+                        oMov.IDMovimiento = Convert.ToInt32(dr["IDMovimiento"]); 
+                        oMov.IDTipoMov = Convert.ToInt32(dr["IDTipoMov"]);
+                        oMov.FechaEmision = dr["FechaEmision"].ToString();                        
+                        oMov.FechaMov = dr["FechaMov"].ToString();                                                                        
+                        oMov.Ing_Evaluador = dr["EntidadDestino"].ToString();
+                        oMov.UndEjec_CAC = dr["EntidadDestino"].ToString();
+                        oMov.Correo = dr["Correo"].ToString();
+                        oMov.Plazo = Convert.ToInt32(dr["Plazo"]);
+                        oMov.Observaciones = dr["Observaciones"].ToString();
+                        oMov.Correlativo = dr["Correlativo"].ToString();
+                        oMov.ET_selected_P = dr["IdsExpedientes"].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return oMov;
+        }
+
+        public List<BEExpediente> fnListarDetalleMovimiento(int IDMovimiento)
+        {
+            List<BEExpediente> listado = new List<BEExpediente>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spSUX_ListarDetalleMovimiento", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDMovimiento", IDMovimiento);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        BEExpediente oExp = new BEExpediente();
+                        oExp.Nro = Convert.ToInt32(dr["Nro"]);
+                        oExp.Snip = Convert.ToInt32(dr["Snip"]);
+                        oExp.NombreProyecto = dr["NombreProyecto"].ToString();
+                        oExp.NumeroHT = dr["NumeroHT"].ToString();
+                        oExp.FechaOficio = dr["FechaOficio"].ToString();
+                        oExp.NVersion = dr["NVersion"].ToString();
+                        oExp.UnidadConservacion = dr["UnidadConservacion"].ToString();
+                        oExp.Folios = dr["Folios"].ToString();
+                        oExp.CDs = dr["CDs"].ToString();                                               
+                        listado.Add(oExp);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return listado;
         }
     }
 }

@@ -43,5 +43,7 @@ namespace BusinessEntity
         public string Archivo { get; set; }
         public string ExtensionFile { get; set; }
         public string Correlativo { get; set; }
+        public List<BEExpediente> ListadoETs { get; set; }
+        public string Correo { get; set; }
     }
 }

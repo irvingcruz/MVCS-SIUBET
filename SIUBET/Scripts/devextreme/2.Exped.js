@@ -76,7 +76,7 @@
 	        height: "auto",
 	        contentTemplate: function () {
 	            var $pageContent = $("<span />");
-	            return $pageContent.load($urlReal + 'Movimiento/PreCrear');
+	            return $pageContent.load($urlReal + 'Movimiento/PreCrear/'+_selectedItems);
 	        },
 	        showCloseButton: true,
 	    });
@@ -90,7 +90,7 @@
 			//{ dataField: "IDVersion", caption: "ID", },
 			//{ dataField: "IDExpTecnico", caption: "IDExpTec", alignment: "center", },
 			{ dataField: "Snip", alignment: "center", },
-			{ dataField: "Proyecto", width: 300, },
+			{ dataField: "NombreProyecto", caption: "Proyecto", width: 300, },
             { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
 			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
             { dataField: "Estado", caption: "Estado Actual", alignment: "center", width: 250, },
