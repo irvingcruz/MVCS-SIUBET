@@ -104,6 +104,7 @@ C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\WebGrease.dll
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\DataAccess.dll
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\BusinessEntity.pdb
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\BusinessLogic.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\EPPlus.xml
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\Microsoft.AI.DependencyCollector.xml
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\Microsoft.AI.ServerTelemetryChannel.xml
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\Microsoft.AI.Web.xml

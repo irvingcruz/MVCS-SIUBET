@@ -1,6 +1,8 @@
 ﻿using BusinessEntity;
 using BusinessLogic;
 using Microsoft.Ajax.Utilities;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using SIUBET.Models;
 using System;
 using System.Collections.Generic;
@@ -8,8 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-
-using Excel = Microsoft.Office.Interop.Excel;
 
 
 namespace SIUBET.Controllers
@@ -372,155 +372,227 @@ namespace SIUBET.Controllers
             //result.message = message;
             return new JsonResult { Data = result };
         }
+        public ActionResult TIndex() {
+            return View();
+        }
+        public ActionResult TCrear(string ets) {
+            BEMovimiento oTransf = new BEMovimiento();
+            oTransf.ET_selected_T = ets;
+            oTransf.FechaEmision = DateTime.Now.ToShortDateString();
+            oTransf.IDTipoMov = 1; //Transferencias
+            return PartialView(oTransf);
+        }
+        public ActionResult TEditar(int id)
+        {
+            BEMovimiento oTransf = new BEMovimiento();
+            oTransf = new BLMovimientos().fnObtenerMovimiento(id);
+            oTransf.Responsable = oTransf.UndEjec_CAC;
+            oTransf.ET_selected_T = oTransf.ET_selected_P;
+            return PartialView("TCrear", oTransf);
+        }
+        [HttpPost]
+        public ActionResult TCrear(BEMovimiento oTransf) {
+            if (!Request.IsAjaxRequest()) return null;
 
-        public ActionResult PrePrintCargo(int IDMovimiento) {
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            BEMovimiento oRpt = new BEMovimiento();
-            oRpt = new BLMovimientos().fnReporteCargoPrestamos(IDMovimiento);
+            try
+            {
+                if (oTransf.Responsable == null || oTransf.Responsable.Trim().Length <= 0)
+                {
+                    result.message = "Ingrese a quien se transfiere.";
+                    goto Terminar;
+                }
 
-            if (oRpt == null) {
-                result.message = "No se encontraron datos para el cargo.";
-                goto Terminar;
+                if (oTransf.IDMovimiento > 0)
+                {
+                    if (oTransf.FileCargo == null)
+                    {
+                        result.message = "Debe anexar un documento de cargo.";
+                        goto Terminar;
+                    }
+
+                    if (oTransf.FileCargo.ContentLength > iMaxSizeFile)
+                    {
+                        result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + oTransf.FileCargo.FileName + ")";
+                        goto Terminar;
+                    }
+
+                    var supportedTypes = new[] { vPDF };
+                    var fileExtCargo = System.IO.Path.GetExtension(oTransf.FileCargo.FileName).Substring(1);
+                    if (!supportedTypes.Contains(fileExtCargo))
+                    {
+                        result.message = "Solo esta permitido documentos PDF.";
+                        goto Terminar;
+                    }
+
+                    oTransf.ExtensionFile = Path.GetExtension(oTransf.FileCargo.FileName);
+                }
+
+                rpta = new BLMovimientos().fnInsertarMovTransferencia(oTransf);
+
+                if (rpta)
+                {
+                    if (oTransf.FileCargo != null)
+                    {
+                        string adjuntoFileCargo = oTransf.Archivo + "-S" + Path.GetExtension(oTransf.FileCargo.FileName);
+                        oTransf.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
+                    }
+                    result.message = vMsgSuccess;
+                }
+                else
+                {
+                    result.message = vMsgFail;
+                }
+
             }
+            catch (Exception)
+            {
+                result.message = vMsgThrow;
+            }
+            Terminar:
+            result.items = null;
+            result.success = rpta;
+            //result.message = message;
+            return new JsonResult { Data = result };
+        }
+        public void PrePrintCargo(int id) {            
+            BEMovimiento oRpt = new BEMovimiento();
+            oRpt = new BLMovimientos().fnReporteCargoPrestamos(id);
 
-            Excel.Application oXL;
-            Excel.Workbook oWB;
-            Excel.Worksheet oSheet;
-            
-            oXL = new Excel.Application();
-            //oXL.Visible = true;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Cargo");
 
-            oWB = oXL.Workbooks.Add();
-            oSheet = (Excel.Worksheet)oWB.Worksheets.get_Item(1);
-            oSheet.Name = "PrestamoCargo";
+            //Construyendo el reporte      
+            ws.Cells["E3:K3"].Merge = true;
+            ws.Cells["E4:K4"].Merge = true;
+            ws.Cells["E3"].Value = "AREA DE ADMINISTRACIÓN DOCUMENTARIA E INFORMÁTICA";
+            ws.Cells["E4"].Value = "FORMULARIO DE SERVICIO ARCHIVÍSTICO N°" + oRpt.Correlativo;
 
-            oSheet.Range["E3", "K3"].MergeCells = true;
-            oSheet.Range["E4", "K4"].MergeCells = true;
-            oSheet.Cells[3, 5] = "AREA DE ADMINISTRACIÓN DOCUMENTARIA E INFORMÁTICA";
-            oSheet.Cells[4, 5] = "FORMULARIO DE SERVICIO ARCHIVÍSTICO N°" + oRpt.Correlativo;
-            
-            oSheet.Cells[7, 9] = "FECHA";
-            oSheet.Cells[7, 10] = oRpt.FechaMov;
+            ws.Cells["I7"].Value = "FECHA";
+            ws.Cells["J7"].Value = oRpt.FechaMov;
 
-            oSheet.Range["C8", "C8"].Font.Bold = true;
-            oSheet.Cells[8, 3] = "DATOS DEL SOLICITANTE";
-            oSheet.Cells[9, 3] = "NOMBRES Y APELLIDOS";
-            oSheet.Cells[10, 3] = "UNIDAD ÓRGANICA";
-            oSheet.Cells[11, 3] = "SEDE";
-            oSheet.Cells[12, 3] = "CORREO";            
+            ws.Cells["C8:C8"].Style.Font.Bold = true;
+            ws.Cells["C8"].Value = "DATOS DEL SOLICITANTE";
+            ws.Cells["C9"].Value = "NOMBRES Y APELLIDOS";
+            ws.Cells["C10"].Value = "UNIDAD ÓRGANICA";
+            ws.Cells["C11"].Value = "SEDE";
+            ws.Cells["C12"].Value = "CORREO";
 
-            oSheet.Cells[9, 6] = oRpt.Ing_Evaluador;
-            oSheet.Cells[10, 6] = "";
-            oSheet.Cells[11, 6] = "OLAECHEA";
-            oSheet.Cells[12, 6] = oRpt.Correo;
+            ws.Cells["F9"].Value = oRpt.Ing_Evaluador;
+            ws.Cells["F10"].Value = "";
+            ws.Cells["F11"].Value = "OLAECHEA";
+            ws.Cells["F12"].Value = oRpt.Correo;
 
-            oSheet.Range["C9", "K12"].BorderAround(Excel.XlLineStyle.xlContinuous);
+            ws.Cells["C9:K12"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            oSheet.Cells[14, 3] = "TIPO DEL SERVICIO";
-            oSheet.Cells[14, 6] = "";
+            ws.Cells["C14"].Value = "TIPO DEL SERVICIO";
+            ws.Cells["F14"].Value = "";
 
-            oSheet.Cells[16, 3] = "ITEM";
-            oSheet.Cells[16, 4] = "SNIP";
-            oSheet.Cells[16, 5] = "DESCRIPCIÓN DEL PIP";
-            oSheet.Cells[16, 6] = "HT";
-            oSheet.Cells[16, 7] = "FECHA HT";
-            oSheet.Cells[16, 8] = "DOCUMENTO DE INGRESO";
-            oSheet.Cells[16, 9] = "UNIDAD DE CONSERVACIÓN";
-            oSheet.Cells[16, 10] = "FOLIOS";
-            oSheet.Cells[16, 11] = "CD";
+            ws.Cells["C16"].Value = "ITEM";
+            ws.Cells["D16"].Value = "SNIP";
+            ws.Cells["E16"].Value = "DESCRIPCIÓN DEL PIP";
+            ws.Cells["F16"].Value = "HT";
+            ws.Cells["G16"].Value = "FECHA HT";
+            ws.Cells["H16"].Value = "DOCUMENTO DE INGRESO";
+            ws.Cells["I16"].Value = "UNIDAD DE CONSERVACIÓN";
+            ws.Cells["J16"].Value = "FOLIOS";
+            ws.Cells["K16"].Value = "CD";
 
-            oSheet.Range["C16", "K16"].Font.Bold = true;            
-            int item = 16;            
+            ws.Cells["C16:K16"].Style.Font.Bold = true;
+            int item = 16;
+
+            var headerTable = ws.Cells["C16:K16"];
+            headerTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            headerTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            headerTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            headerTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+
             foreach (BEExpediente exp in oRpt.ListadoETs)
             {
                 item++;
-                oSheet.Cells[item, 3] = exp.Nro;
-                oSheet.Cells[item, 4] = exp.Snip;
-                oSheet.Cells[item, 5] = exp.NombreProyecto;
-                oSheet.Cells[item, 6] = exp.NumeroHT;
-                oSheet.Cells[item, 7] = exp.FechaOficio;
-                oSheet.Cells[item, 8] = exp.NVersion;
-                oSheet.Cells[item, 9] = exp.UnidadConservacion;
-                oSheet.Cells[item, 10] = exp.Folios;
-                oSheet.Cells[item, 11] = exp.CDs;
-            }
-            oSheet.Range["C16", "K" + item.ToString()].Borders.Weight = Excel.XlBorderWeight.xlThin;
+                ws.Cells["C" + item.ToString()].Value = exp.Nro;
+                ws.Cells["D" + item.ToString()].Value = exp.Snip;
+                ws.Cells["E" + item.ToString()].Value = exp.NombreProyecto;
+                ws.Cells["F" + item.ToString()].Value = exp.NumeroHT;
+                ws.Cells["G" + item.ToString()].Value = exp.FechaOficio;
+                ws.Cells["H" + item.ToString()].Value = exp.NVersion;
+                ws.Cells["I" + item.ToString()].Value = exp.UnidadConservacion;
+                ws.Cells["J" + item.ToString()].Value = exp.Folios;
+                ws.Cells["K" + item.ToString()].Value = exp.CDs;
 
-            oSheet.Range["C16", "K" + item.ToString()].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-            oSheet.Range["C16", "K" + item.ToString()].VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
-            //oSheet.Range["E17", "E" + item.ToString()].WrapText = true;            
-            oSheet.Range["H16", "K" + item.ToString()].WrapText = true;
-            
+                var bodyTable = ws.Cells["C" + item.ToString() + ":K" + item.ToString()];
+                bodyTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                bodyTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                bodyTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                bodyTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            }
+
+            ws.Cells["C16:K" + item.ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            ws.Cells["C16:K" + item.ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            ws.Cells["E17:E" + item.ToString()].Style.WrapText = true;
+            ws.Cells["H16:K" + item.ToString()].Style.WrapText = true;
 
             item++;
-            oSheet.Cells[item, 3] = "OBSERVACIONES";
-            oSheet.Range["E" + item.ToString(), "K" + (item+1).ToString()].MergeCells = true;
-            oSheet.Range["E" + item.ToString(), "K" + (item + 1).ToString()].VerticalAlignment = Excel.XlVAlign.xlVAlignTop;
-            oSheet.Cells[item, 5] = oRpt.Observaciones;
-            
+            ws.Cells["C" + item.ToString()].Value = "OBSERVACIONES";
+            ws.Cells["E" + item.ToString() + ":K" + (item + 1).ToString()].Merge = true;
+            ws.Cells["E" + item.ToString() + ":K" + (item + 1).ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            ws.Cells["E" + item.ToString()].Value = oRpt.Observaciones;
+
             item = item + 4;
             int itemFirmas = item;
-            oSheet.Range["H" + item.ToString(), "J" + item.ToString()].MergeCells = true;
-            oSheet.Cells[item, 5] = "__________________________";
-            oSheet.Cells[item, 8] = "___________________________________________";
+            ws.Cells["H" + item.ToString() + ":J" + item.ToString()].Merge = true;
+            ws.Cells["E" + item.ToString()].Value = "__________________________";
+            ws.Cells["H" + item.ToString()].Value = "___________________________________________";
 
             item++;
-            oSheet.Range["H" + item.ToString(), "J" + item.ToString()].MergeCells = true;
-            oSheet.Cells[item, 5] = "RESPONSABLE DE PRÉSTAMO";
-            oSheet.Cells[item, 8] = "CONFORMIDAD DE RECEPCIÓN DEL SOLICITANTE";
+            ws.Cells["H" + item.ToString() + ":J" + item.ToString()].Merge = true;
+            ws.Cells["E" + item.ToString()].Value = "RESPONSABLE DE PRÉSTAMO";
+            ws.Cells["H" + item.ToString()].Value = "CONFORMIDAD DE RECEPCIÓN DEL SOLICITANTE";
 
             item = item + 2;
-            oSheet.Range["F" + item.ToString(), "G" + item.ToString()].MergeCells = true;
-            oSheet.Cells[item, 6] = "_____________________________";
+            ws.Cells["F" + item.ToString() + ":G" + item.ToString()].Merge = true;
+            ws.Cells["F" + item.ToString()].Value = "_____________________________";
 
             item++;
-            oSheet.Range["F" + item.ToString(), "G" + item.ToString()].MergeCells = true;
-            oSheet.Cells[item, 6] = "CONFORMIDAD DE DEVOLUCIÓN";
+            ws.Cells["F" + item.ToString() + ":G" + item.ToString()].Merge = true;
+            ws.Cells["F" + item.ToString()].Value = "CONFORMIDAD DE DEVOLUCIÓN";
 
-            item++;           
+            item++;
 
-            oSheet.Range["A1", "K" + item.ToString()].Font.Name = "Tahoma";
-            oSheet.Range["A1", "K" + item.ToString()].Font.Size = 10;
-            oSheet.Range["A3", "K4"].Font.Size = 14;
-            oSheet.Range["A17", "K" + item.ToString()].Font.Size = 9;
-            oSheet.Range["A3", "K4"].Font.Bold = true;
-            oSheet.Range["E3","K4"].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-            oSheet.Range["C" + itemFirmas.ToString(), "K" + item.ToString()].HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            ws.Cells["A1:K" + item.ToString()].Style.Font.Name = "Tahoma";
+            ws.Cells["A1:K" + item.ToString()].Style.Font.Size = 10;
+            ws.Cells["A3:K4"].Style.Font.Size = 14;
+            ws.Cells["A17:K" + item.ToString()].Style.Font.Size = 9;
+            ws.Cells["A3:K4"].Style.Font.Bold = true;
+            ws.Cells["E3:K4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            ws.Cells["C" + itemFirmas.ToString() + ":K" + item.ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            oSheet.Range["B2", "L" + item.ToString()].BorderAround(Excel.XlLineStyle.xlContinuous);
+            ws.Cells["B2:L" + item.ToString()].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            oSheet.Cells[1, 1].ColumnWidth = 1;
-            oSheet.Cells[1, 2].ColumnWidth = 1;
-            oSheet.Cells[1, 3].ColumnWidth = 8;
-            oSheet.Cells[1, 4].ColumnWidth = 10;
-            oSheet.Cells[1, 5].ColumnWidth = 50;
-            oSheet.Cells[1, 6].ColumnWidth = 18;
-            oSheet.Cells[1, 7].ColumnWidth = 12;
-            oSheet.Cells[1, 8].ColumnWidth = 30;
-            oSheet.Cells[1, 9].ColumnWidth = 20;
-            oSheet.Cells[1, 10].ColumnWidth = 11;
-            oSheet.Cells[1, 11].ColumnWidth = 11;
-            oSheet.Cells[1, 12].ColumnWidth = 1;
+            ws.Column(1).Width = 1;
+            ws.Column(2).Width = 1;
+            ws.Column(3).Width = 8;
+            ws.Column(4).Width = 10;
+            ws.Column(5).Width = 50;
+            ws.Column(6).Width = 18;
+            ws.Column(7).Width = 12;
+            ws.Column(8).Width = 30;
+            ws.Column(9).Width = 20;
+            ws.Column(10).Width = 11;
+            ws.Column(11).Width = 11;
+            ws.Column(12).Width = 1;
 
-            var _print = oSheet.PageSetup;
-            _print.Zoom = false;
-            _print.FitToPagesWide = 1;
-            _print.Orientation = Excel.XlPageOrientation.xlLandscape;
+            ws.PrinterSettings.FitToPage = true;
+            ws.PrinterSettings.Orientation = eOrientation.Portrait;
 
-            //oSheet.Range["B2:L" + item.ToString()].PrintOut();
+            //fin
 
-            oXL.Visible = true;
-            oXL.UserControl = true;
-
-            rpta = true;
-            result.message = "Documento de cargo generado correctamente.";
-
-            Terminar:
-            result.success = rpta;
-            //result.message = "Exportando a Excel";
-            return new JsonResult { Data = result };
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.AddHeader("content-disposition", "attachment;  filename=Sample1.xlsx");
+            Response.BinaryWrite(pck.GetAsByteArray());
+            Response.End();
         }
-
     }
 }

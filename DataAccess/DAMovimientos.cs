@@ -109,13 +109,11 @@ namespace DataAccess
                         oMov.Responsable = dr["Responsable"].ToString();
                         oMov.NumeroCargo = dr["NumeroCargo"].ToString();
                         oMov.NombreFileCargo = dr["NombreFileCargo"].ToString();
-                        if (oMov.IDTipoMov == 4)
-                        {
-                            oMov.Ing_Evaluador = dr["EntidadDestino"].ToString();
-                        }
-                        else {
-                            oMov.UndEjec_CAC = dr["EntidadDestino"].ToString();
-                        }
+
+                        if (oMov.IDTipoMov == 4) oMov.Ing_Evaluador = dr["EntidadDestino"].ToString();
+                        if (oMov.IDTipoMov == 2 || oMov.IDTipoMov == 5) oMov.UndEjec_CAC = dr["EntidadDestino"].ToString();
+                        if (oMov.IDTipoMov == 1) oMov.Responsable = dr["EntidadDestino"].ToString();
+
                         oMov.FechaFinal = dr["FechaFinal"].ToString();
                         oMov.NombreFileFinal= dr["NombreFileFinal"].ToString();
                         oMov.Plazo = Convert.ToInt32(dr["Plazo"]);
@@ -204,7 +202,6 @@ namespace DataAccess
             }
             return rpta;
         }
-
         public bool fnAnularMovimiento(BEMovimiento oMov)
         {
             bool rpta = false;
@@ -232,7 +229,6 @@ namespace DataAccess
             }
             return rpta;
         }
-
         public BEMovimiento fnObtenerMovimiento(int IDMovimiento) {
             BEMovimiento oMov = new BEMovimiento();
             try
@@ -270,7 +266,6 @@ namespace DataAccess
             }
             return oMov;
         }
-
         public List<BEExpediente> fnListarDetalleMovimiento(int IDMovimiento)
         {
             List<BEExpediente> listado = new List<BEExpediente>();
@@ -307,6 +302,40 @@ namespace DataAccess
                 oCon.Close();
             }
             return listado;
+        }
+        public bool fnInsertarMovTransferencia(BEMovimiento oPrestamo)
+        {
+            bool rpta = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spiSUX_InsertarMovTransferencia", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDMovimiento", oPrestamo.IDMovimiento);
+                cmd.Parameters.AddWithValue("@FechaMov", oPrestamo.FechaEmision);
+                cmd.Parameters.AddWithValue("@IDTipoMov", oPrestamo.IDTipoMov);
+                cmd.Parameters.AddWithValue("@Responsable", oPrestamo.Responsable);
+                cmd.Parameters.AddWithValue("@Observaciones", oPrestamo.Observaciones);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected_T);
+                cmd.Parameters.AddWithValue("@ExtensionFile", oPrestamo.ExtensionFile);
+                cmd.Parameters.AddWithValue("@Usuario", "irving");
+                cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
+                cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
+                oCon.Open();
+
+                cmd.ExecuteNonQuery();
+                rpta = Convert.ToBoolean(cmd.Parameters["@rpta"].Value);
+                oPrestamo.Archivo = cmd.Parameters["@Archivo"].Value.ToString();
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return rpta;
         }
     }
 }

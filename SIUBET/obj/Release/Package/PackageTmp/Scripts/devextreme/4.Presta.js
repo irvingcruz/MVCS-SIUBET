@@ -34,7 +34,7 @@
                     dato.appendTo(container);
                 }
             },
-            { dataField: "EntidadDestino", caption: "Ingeniero/Otros", width: 200, },
+            { dataField: "Ing_Evaluador", caption: "Ingeniero/Otros", width: 200, },
             //{ dataField: "FechaRecepcion", caption: "Fec. Recepción", alignment: "center", width: 100, },
             {
                 caption: "Fec. Retorno Real",
@@ -63,10 +63,10 @@
                 cellTemplate: function (container, options) {                    
                     var item = options.data;
                     var disabledR = true;
-                    var disabledF = true;
+                    var disabledE = true;
                     if (item.Activo == true) {
                         if (item.FechaFinal.length <= 0 && item.NombreFileCargo.length > 0) disabledR = false;
-                        if (item.FechaFinal.length <= 0 && item.NombreFileCargo.length == 0) disabledF = false;                        
+                        if (item.FechaFinal.length <= 0 && item.NombreFileCargo.length == 0) disabledE = false;                        
                     }
                     $('<div />').appendTo(container)
                     .dxToolbar({
@@ -89,12 +89,12 @@
 							    location: 'after',
 							    widget: 'dxButton',
 							    locateInMenu: 'auto',
-							    disabled: disabledF,
+							    disabled: disabledE,
 							    options: {
-							        icon: "glyphicon glyphicon-file",
-							        text: "Anexar cargo",
+							        icon: "glyphicon glyphicon-edit",
+							        text: "Editar",
 							        onClick: function () {
-							            openPopupRetornaRecepciona(item);
+							            openPopupPrestamoEdit(item.IDMovimiento);
 							        }
 							    }
 							},
@@ -162,5 +162,20 @@
     });
 
     fnListarMovimientos(0, 4, gridPrestamos.dxDataGrid("instance"));
+
+    function openPopupPrestamoEdit(IDMovimiento) {
+        popupPrestamoEdit = $("#popup-prestamo-edit").dxPopup({
+            showTitle: true,
+            title: 'Editar Préstamo',
+            width: 880,
+            height: "auto",
+            contentTemplate: function () {
+                var $pageContent = $("<span />");
+                return $pageContent.load($urlReal + 'Movimiento/PreEditar/' + IDMovimiento);
+            },
+            showCloseButton: true,
+        });
+        popupPrestamoEdit.dxPopup("instance").show();
+    }
 
 });

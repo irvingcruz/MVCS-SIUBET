@@ -1,5 +1,6 @@
 ﻿<script>
-    $('#dp1').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+    $('#dp3').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+    $('#dp4').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
 </script>
 @model BusinessEntity.BEMovimiento
 
@@ -10,9 +11,9 @@
     <div class="row">
         <div class="col-xs-12 col-md-3">
             <div class="form-group">
-                <span class="control-label">Fecha</span>
-                <div class='input-group date' id='dp1'>
-                    @Html.EditorFor(model => model.FechaMov, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
+                <span class="control-label">Fecha Solicitud</span>
+                <div class='input-group date' id='dp3'>
+                    @Html.EditorFor(model => model.FechaEmision, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -21,51 +22,59 @@
         </div>
         <div class="col-xs-12 col-md-3">
             <div class="form-group">
+                <span class="control-label">Fecha Entrega</span>
+                <div class='input-group date' id='dp4'>
+                    @Html.EditorFor(model => model.FechaMov, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-2">
+            <div class="form-group">
                 <label>Plazo (días)</label>
                 @Html.EditorFor(model => model.Plazo, new { htmlAttributes = new { @class = "form-control", @placeholder = "0" } })
             </div>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12 col-md-4">
             <div class="form-group">
-                @*<label>&nbsp;</label>
-                @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })*@
                 <label>Ingenieros/Otros</label>
-                <div id="cboIng"></div>
-                <input type="hidden" name="Ing_Evaluador" id="Ing_Evaluador" value="" />
+                @*<div id="cboIng"></div>*@
+                @*<input type="text" name="Ing_Evaluador" id="Ing_Evaluador" value="@Model.Ing_Evaluador" />*@
+                @Html.EditorFor(model => model.Ing_Evaluador, new { htmlAttributes = new { @class = "form-control", @placeholder = "Escribir Nombre" } })
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12 col-md-7">
+        <div class="col-xs-12 col-md-6">
             <div class="form-group">
-                @*<label>Ingenieros/Otros</label>
-                <div id="cboIng"></div>
-                <input type="hidden" name="Ing_Evaluador" id="Ing_Evaluador" value="" />*@
+                <label>Cargo</label>
+                @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <div class="form-group">
                 <label>Observaciones</label>
                 @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @maxlength = "100" })
             </div>
         </div>
-        @*<div class="col-xs-12 col-md-7">
-            <div class="form-group">
-                <label>Observaciones</label>
-                @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @maxlength = "100" })
-            </div>
-        </div>*@
     </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
                 <div id="gridExpedientesSelectedPRE"></div>
-                @*@Html.EditorFor(model => model.ET_selected, new { htmlAttributes = new { @class = "form-control", @id = "id_exps_selected" } })*@    
-                <input type="hidden" name="ET_selected_P" id="ET_selected_P" class="form-control" value="" />            
-                @Html.EditorFor(model => model.IDTipoMov, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })                
+                @Html.EditorFor(model => model.ET_selected_P, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })       
+                @Html.EditorFor(model => model.IDTipoMov, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
+                @Html.EditorFor(model => model.IDMovimiento, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })                
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
-                <input type="button" id="btnGrabarPre" value="Create" class="btn btn-primary" />
+                <button type="button" class="btn btn-primary btn-sm" id="btnGrabarPre"><span class="glyphicon glyphicon-floppy-disk"></span> Grabar</button>
+                <button type="button" class="btn btn-default btn-sm" id="btnImprimir"><span class="glyphicon glyphicon-print"></span> Imprimir Cargo</button>
             </div>
         </div>
     </div>
@@ -74,8 +83,11 @@
 
 <script>
 
+    var IDMovimiento = @Model.IDMovimiento;
+    if(IDMovimiento == 0) $("#btnImprimir").attr("disabled", true);
+
     $("#btnGrabarPre").on("click", function () {
-        var _Data = new FormData(document.getElementById("frmPre"));        
+        var _Data = new FormData(document.getElementById("frmPre"));
         $.ajax({
             url: $urlReal + "Movimiento/PreCrear",
             //data: $("#frmDev").serialize(),
@@ -89,8 +101,14 @@
                 //console.log(result);
                 if (result.success == true) {
                     showNotification(result.message, notificationTypes.success, 2000);
-                    popupPrestamo.dxPopup("instance").hide();
-                    gridExpedientes.dxDataGrid("instance").refresh();
+                    if(IDMovimiento == 0){
+                        popupPrestamo.dxPopup("instance").hide();
+                        gridExpedientes.dxDataGrid("instance").refresh();
+                    }else{
+                        popupPrestamoEdit.dxPopup("instance").hide();
+                        gridPrestamos.dxDataGrid("instance").refresh();
+                    }
+                    
                 } else {
                     showNotification(result.message, notificationTypes.warning, 2000);
                 }
@@ -101,7 +119,32 @@
             timeout: 500000
         });
     });
-    var id_exps_selected = $("#et_selected").val();    
+
+    $("#btnImprimir").on("click", function(){
+        var args = {};
+        args.IDMovimiento = IDMovimiento; @*@Model.IDMovimiento;*@
+        //console.log(args);
+        showNotification("Estamos generando el documento..! ", notificationTypes.info,10000);
+        $.ajax({
+            url: $urlReal + "Movimiento/PrePrintCargo",
+            data: JSON.stringify(args),
+            type: 'POST',
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (result) {
+                if (result.success == true) {
+                    showNotification(result.message, notificationTypes.success, 2000);
+                } else {
+                    showNotification(result.message, notificationTypes.warning, 2000);
+                }
+            },
+            error: function () {
+                showNotification("Error al exportar el cargo", notificationTypes.error, 2000);
+            },
+            timeout: 500000
+        });
+    });
+    //var id_exps_selected = $("#et_selected").val();
 
     var gridExpedientesSelected = $("#gridExpedientesSelectedPRE").dxDataGrid({
         columns: [
@@ -154,13 +197,14 @@
     var pageIndex = 0;
     var listadoExpedientes = new DevExpress.data.CustomStore({
         load: function (loadOptions) {
+
             var deferred = $.Deferred(),
 				args = {};
-            $("#ET_selected_P").val(id_exps_selected);
-            args.IdsExpedientes = id_exps_selected;
+            //$("#ET_selected_P").val(id_exps_selected);
+            args.IdsExpedientes = $("#ET_selected_P").val();// id_exps_selected;
             args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientesSelected.dxDataGrid("instance")._options.paging.pageIndex + 1;
             args.pageSize = loadOptions.take || 10;
-
+            console.log(args);
             $.ajax({
                 url: $urlReal + "Expedientes/ListadoExpedientesSelected",
                 data: JSON.stringify(args),
@@ -194,7 +238,7 @@
     var listado = new DevExpress.data.CustomStore({
         load: function (loadOptions) {
             var deferred = $.Deferred();
-            var args = {};            
+            var args = {};
             args.Tipo = @Model.IDTipoMov;
             console.log(args);
             $.ajax({
@@ -220,7 +264,7 @@
 
     });
 
-    var cboIng = $("#cboIng").dxSelectBox({
+    cboIng = $("#cboIng").dxSelectBox({
         dataSource: {
             store: listado
         },
@@ -228,6 +272,7 @@
         displayExpr: "Nombres",
         valueExpr: "Nombres",
         searchEnabled: true,
+
         onValueChanged: function (e) {
             var ide = e.value;
             var Ing_Evaluador = $("#Ing_Evaluador");
@@ -235,6 +280,8 @@
             Ing_Evaluador.val(ide);
         }
     });
+
+
 
 </script>
 

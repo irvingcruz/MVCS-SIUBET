@@ -1,5 +1,5 @@
 ﻿<script>
-    $('#dp1').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+    $('#dp5').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
 </script>
 @model BusinessEntity.BEMovimiento
 
@@ -12,7 +12,7 @@
             <input type="hidden" name="IDMovimiento" id="IDMovimiento" value="@Model.IDMovimiento" />
             <div class="form-group">
                 <span class="control-label">Fecha</span>
-                <div class='input-group date' id='dp1'>
+                <div class='input-group date' id='dp5'>
                     @Html.EditorFor(model => model.FechaFinal, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
@@ -46,7 +46,7 @@
     </div>
 }
 <script>
-    $("#btnRetonar").on("click", function () {
+    $("#btnRetornar").on("click", function () {
         var _Data = new FormData(document.getElementById("frmPre"));
         $.ajax({
             url: $urlReal + "/Movimiento/PreRetornar",

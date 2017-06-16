@@ -111,3 +111,7 @@ label {
 .dx-texteditor {
     padding: 4px;
 }
+a.disabled {
+   pointer-events: none;
+   cursor: default;
+}

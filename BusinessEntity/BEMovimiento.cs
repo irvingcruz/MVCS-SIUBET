@@ -25,6 +25,7 @@ namespace BusinessEntity
         public string FechaFinal { get; set; }
         public string ET_selected_D { get; set; }
         public string ET_selected_P { get; set; }
+        public string ET_selected_T { get; set; }
         public string Numero { get; set; }
         public string Folios { get; set; }
         public string CDs { get; set; }

@@ -7,6 +7,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.IO;
+
 namespace SIUBET.Controllers
 {
     public class ExpedientesController : Controller
@@ -14,6 +18,29 @@ namespace SIUBET.Controllers
         // GET: Expedientes
         public ActionResult Index()
         {
+            //ExcelPackage pck = new ExcelPackage();
+            //var ws = pck.Workbook.Worksheets.Add("Sample1");
+
+            //ws.Cells["A1"].Value = "Sample 1";
+            //ws.Cells["A1"].Style.Font.Bold = true;
+            //var shape = ws.Drawings.AddShape("Shape1", eShapeStyle.Rect);
+            //shape.SetPosition(50, 200);
+            //shape.SetSize(200, 100);
+            //shape.Text = "Sample 1 saves to the Response.OutputStream";
+
+            //pck.SaveAs(Response.OutputStream);
+            //Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            //Response.AddHeader("content-disposition", "attachment;  filename=Sample1.xlsx");
+
+            //============
+
+            //string filePath = Server.MapPath("~/Content/ExcelReport.xlsx");
+            //FileInfo Files = new FileInfo(filePath);
+            //ExcelPackage excel = new ExcelPackage();
+            //var sheetCreate = excel.Workbook.Worksheets.Add("Cargo");
+            //sheetCreate.Cells[1, 1].Value = "Hola Mundo";
+            //excel.SaveAs(Response.OutputStream);
+
             return View();
         }
 

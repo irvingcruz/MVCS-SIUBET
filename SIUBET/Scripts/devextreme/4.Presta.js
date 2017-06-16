@@ -34,7 +34,7 @@
                     dato.appendTo(container);
                 }
             },
-            { dataField: "EntidadDestino", caption: "Ingeniero/Otros", width: 200, },
+            { dataField: "Ing_Evaluador", caption: "Ingeniero/Otros", width: 200, },
             //{ dataField: "FechaRecepcion", caption: "Fec. Recepción", alignment: "center", width: 100, },
             {
                 caption: "Fec. Retorno Real",

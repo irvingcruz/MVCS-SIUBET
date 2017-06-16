@@ -111,7 +111,6 @@ namespace BusinessLogic
                 throw;
             }
         }
-
         public BEMovimiento fnReporteCargoPrestamos(int IDMovimiento) {            
             try
             {
@@ -122,6 +121,20 @@ namespace BusinessLogic
                     resultado.ListadoETs = new DAMovimientos(oCon).fnListarDetalleMovimiento(IDMovimiento);
                 }
                 return resultado;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public bool fnInsertarMovTransferencia(BEMovimiento oTransf)
+        {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAMovimientos obj = new DAMovimientos(oCon);
+                return obj.fnInsertarMovTransferencia(oTransf);
             }
             catch (Exception)
             {

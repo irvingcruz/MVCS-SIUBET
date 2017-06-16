@@ -9,7 +9,7 @@
         { "ID": 0, "Name": "-- TODOS --" },
         { "ID": 1, "Name": "TRANSFERIDOS" },
         { "ID": 2, "Name": "DEVUELTOS" },
-        { "ID": 3, "Name": "EN CUSTODIA" },
+        //{ "ID": 3, "Name": "EN CUSTODIA" },
         { "ID": 4, "Name": "EN PRESTAMO" },
         { "ID": 5, "Name": "DERIVADOS" },      
 	];
@@ -83,6 +83,27 @@
 	    popupPrestamo.dxPopup("instance").show();
 	}
 
+	function fnOpenPopupTransferencia() {
+	    //console.log(_selectedItems);
+	    if (_selectedItems == "") {
+	        showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
+	        return;
+	    }
+
+	    popupTransferencia = $("#popup-transferencia").dxPopup({
+	        showTitle: true,
+	        title: 'Crear Transferencia',
+	        width: 880,
+	        height: "auto",
+	        contentTemplate: function () {
+	            var $pageContent = $("<span />");
+	            return $pageContent.load($urlReal + 'Movimiento/TCrear/' + _selectedItems);
+	        },
+	        showCloseButton: true,
+	    });
+	    popupTransferencia.dxPopup("instance").show();
+	}
+
 	gridExpedientes = $("#gridExpedientes").dxDataGrid({
 		columns: [
 
@@ -94,10 +115,11 @@
             { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
 			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
             { dataField: "Estado", caption: "Estado Actual", alignment: "center", width: 250, },
+            { dataField: "UbiTopografica", caption: "U.Topográfica (E:C:B) | (PQ:PO)", width: 200, },
 			//{ dataField: "Activo", dataType: "boolean", alignment: "center", },
 			{
 			    caption: "...",
-			    //fixed: true,
+			    fixed: true,
 			    allowHiding: false,
 			    alignment: "center",
 			    width: 35,
@@ -151,7 +173,7 @@
 							        icon: "glyphicon glyphicon-share",
 							        text: "Transferir",
 							        onClick: function () {
-							            DevExpress.ui.notify("Realizar transferencia");
+							            fnOpenPopupTransferencia();
 							        }
 							    }
 							},

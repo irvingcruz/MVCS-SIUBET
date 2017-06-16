@@ -125,7 +125,7 @@ function fnListarMovimientos(pageIndex, IDTipo, gridMovs) {
                 args = {};
             args.Snip = txtSnip.dxTextBox("instance").option("value");
             if (args.Snip == "") args.Snip = 0;
-            args.IDTipoMov = IDTipo; //[2]Devoluciones, [4]Préstamos
+            args.IDTipoMov = IDTipo; //[2]Devoluciones, [4]Préstamos, [1]Transferencias
             args.pageNumber = pageIndex == 1 ? pageIndex : gridMovs._options.paging.pageIndex + 1;
             args.pageSize = loadOptions.take || 10;
 
