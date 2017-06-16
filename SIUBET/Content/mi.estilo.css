@@ -115,3 +115,38 @@ a.disabled {
    pointer-events: none;
    cursor: default;
 }
+
+#leyenda-items .material-icons {
+    font-size:18px;
+    vertical-align: bottom;
+}
+#leyenda-items label {
+    display: inline-block;
+    padding:0px 10px 0px 0px;
+}
+
+.Transferencias, .Devoluciones, .Prestamos, .Derivaciones {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    background: #ffedcb;
+        margin-right: 5px;
+}
+
+.Transferencias {
+    border-left: 2px solid rgba(221, 166, 2,0.9);
+    background: rgba(243, 207, 85, 0.5);
+}
+.Devoluciones {
+    border-left: 2px solid rgba(222, 140, 85, 0.9);
+    background: rgba(207, 176, 149, 0.5);
+}
+.Prestamos {
+    border-left: 2px solid rgba(22, 126, 230, 0.9);
+    background: rgba(149, 222, 227, 0.5);
+}
+.Derivaciones {
+    border-left: 2px solid rgba(5, 164, 98, 0.9);
+    background: rgba(136, 176, 75, 0.5);
+}

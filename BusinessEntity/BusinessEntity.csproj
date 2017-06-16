@@ -45,6 +45,7 @@
     <Compile Include="BEMovimiento.cs" />
     <Compile Include="BEExpediente.cs" />
     <Compile Include="BERespDev.cs" />
+    <Compile Include="BEUsuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BEPersona.cs" />
   </ItemGroup>

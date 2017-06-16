@@ -12,9 +12,11 @@ namespace DataAccess
     public class DAMovimientos
     {
         SqlConnection oCon;
+        BEUsuario oUsuario = new BEUsuario();
         public DAMovimientos(SqlConnection _oCon)
         {
             this.oCon = _oCon;
+            
         }
 
         public bool fnInsertarMovDD(BEMovimiento oDD) {
@@ -32,7 +34,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@Observaciones", oDD.Observaciones);
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oDD.ET_selected_D);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oDD.ExtensionFile);
-                cmd.Parameters.AddWithValue("@Usuario", "irving");
+                cmd.Parameters.AddWithValue("@Usuario", oUsuario.UserName);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();

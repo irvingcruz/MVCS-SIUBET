@@ -40,6 +40,7 @@ namespace DataAccess
                         oExp.NumeroHT = dr["NumeroHT"].ToString();
                         oExp.NVersion = dr["NVersion"].ToString();                        
                         oExp.Estado = dr["Estado"].ToString();
+                        oExp.IDTipoMov = Convert.ToInt32(dr["IDTipoMov"]);
                         oExp.UbiTopografica = dr["UbiTopografica"].ToString();
                         oExp.Activo = Convert.ToBoolean(dr["Activo"]);
                         listado.Add(oExp);

@@ -194,8 +194,36 @@
 					});
 			    }
 			},
-
 		],
+        onRowPrepared: function (e) {
+            if (e.rowType == "data") {
+                //console.log(e.data)
+                if (e.data.IDTipoMov == 1) {//Transferencias
+                    //Amarillo
+                    e.rowElement.css('border-left', '5px solid rgba(221, 166, 2,0.9)');
+                    e.rowElement.css('background', 'rgba(243, 207, 85, 0.5)');
+                    e.rowElement.css('color', 'black');
+                }
+                else if (e.data.IDTipoMov == 2) {//Devoluciones
+                    //Beish
+                    e.rowElement.css('border-left', '5px solid rgba(222, 140, 85, 0.9)');
+                    e.rowElement.css('background', 'rgba(207, 176, 149, 0.5)');
+                    e.rowElement.css('color', 'black');
+                }
+                else if (e.data.IDTipoMov == 4) {//Préstamos
+                    //Celeste
+                    e.rowElement.css('border-left', '5px solid rgba(22, 126, 230, 0.9)');
+                    e.rowElement.css('background', 'rgba(149, 222, 227, 0.5)');
+                    e.rowElement.css('color', 'black');
+                }
+                else if (e.data.IDTipoMov == 5) {//Derivaciones
+                    //Verde
+                    e.rowElement.css('border-left', '5px solid rgba(5, 164, 98, 0.9)');
+                    e.rowElement.css('background', 'rgba(136, 176, 75, 0.5)');
+                    e.rowElement.css('color', 'black');
+                }
+            }
+        },
 		onSelectionChanged: function (selectedItems) {
 		    var data = selectedItems.selectedRowsData;
 		    if (data.length > 0) {
@@ -243,7 +271,7 @@
 		wordWrapEnabled: true,
 		showColumnLines: false,
 		showRowLines: false,
-		rowAlternationEnabled: true,
+		//rowAlternationEnabled: true,
 		hoverStateEnabled: true,
 		columnAutoWidth: true,
 		allowColumnResizing: true,

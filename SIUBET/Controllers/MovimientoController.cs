@@ -14,6 +14,7 @@ using System.Web.Mvc;
 
 namespace SIUBET.Controllers
 {
+    [Authorize]
     public class MovimientoController : Controller
     {
         private string vMsgSuccess = "El registró se guardó correctamente.";

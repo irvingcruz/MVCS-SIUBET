@@ -41,10 +41,20 @@
             </div>*@
             <ul class="nav navbar-nav navbar-right ">
                 <li class="dropdown panelSession">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Usuario: | <label style="font-style: italic;">Irving Cruz</label>  <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#"> > Cerrar Sesión</a></li>
-                    </ul>
+                    @{
+                        if (Request.IsAuthenticated)
+                        {
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Bienvenido: | <label style="font-style: italic;"> Usuario MVCS</label>  <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                                {
+                                    <li><a href="javascript:document.getElementById('logoutForm').submit()"> > Cerrar Sesión</a></li>
+                                }                                
+                            </ul>
+                        }
+                        else { }
+                    }
+
                 </li>
             </ul>
 

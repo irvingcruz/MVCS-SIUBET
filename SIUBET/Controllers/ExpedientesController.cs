@@ -13,9 +13,10 @@ using System.IO;
 
 namespace SIUBET.Controllers
 {
+    [Authorize]
     public class ExpedientesController : Controller
     {
-        // GET: Expedientes
+        // GET: Expedientes       
         public ActionResult Index()
         {
             //ExcelPackage pck = new ExcelPackage();

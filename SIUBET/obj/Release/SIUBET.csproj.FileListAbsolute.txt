@@ -130,3 +130,4 @@ C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\es\System.Web.WebPages.Razor.resources.
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\obj\Release\SIUBET.csprojResolveAssemblyReference.cache
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\obj\Release\SIUBET.dll
 C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\obj\Release\SIUBET.pdb
+C:\_MVCS-GIT-Apps\MVCS-SIUBET\SIUBET\bin\EPPlus.xml

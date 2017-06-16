@@ -28,6 +28,7 @@ namespace BusinessEntity
         public string Serie { get; set; }
         public string SubSerie { get; set; }
         public string UbiTopografica { get; set; }
+        public int IDTipoMov { get; set; }
 
     }
 }
