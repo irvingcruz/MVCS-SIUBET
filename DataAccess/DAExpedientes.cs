@@ -26,6 +26,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@Snip", _oExp.Snip);
                 cmd.Parameters.AddWithValue("@NumeroHT", _oExp.NumeroHT);
                 cmd.Parameters.AddWithValue("@Estado", _oExp.Estado);
+                cmd.Parameters.AddWithValue("@Etapa", _oExp.Etapa);                
                 oCon.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                 {
@@ -40,6 +41,7 @@ namespace DataAccess
                         oExp.NumeroHT = dr["NumeroHT"].ToString();
                         oExp.NVersion = dr["NVersion"].ToString();                        
                         oExp.Estado = dr["Estado"].ToString();
+                        oExp.Etapa = dr["Etapa"].ToString();
                         oExp.IDTipoMov = Convert.ToInt32(dr["IDTipoMov"]);
                         oExp.UbiTopografica = dr["UbiTopografica"].ToString();
                         oExp.Activo = Convert.ToBoolean(dr["Activo"]);
@@ -205,6 +207,65 @@ namespace DataAccess
                 oCon.Close();
             }
             return listado;
+        }
+        public bool fnInsertarUpdateExpediente(BEExpediente oExp, string vUsuario)
+        {
+            bool rpta = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spiuSUX_InsertarUpdateExpediente", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDVersion", oExp.IDVersion);
+                cmd.Parameters.AddWithValue("@Snip", oExp.Snip);
+                cmd.Parameters.AddWithValue("@Seccion", oExp.Seccion);
+                cmd.Parameters.AddWithValue("@Serie", oExp.Serie);
+                cmd.Parameters.AddWithValue("@SubSerie", oExp.SubSerie);
+                cmd.Parameters.AddWithValue("@NumeroHT", oExp.NumeroHT);
+                cmd.Parameters.AddWithValue("@DocIngreso", oExp.NVersion);
+                cmd.Parameters.AddWithValue("@Ubicacion", oExp.UbiTopografica);
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
+                cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
+                oCon.Open();
+
+                cmd.ExecuteNonQuery();
+                rpta = Convert.ToBoolean(cmd.Parameters["@rpta"].Value);
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return rpta;
+        }
+
+        public bool fnActualizarEtapaET(string vEtapa, string IdsExpedientes, string vUsuario)
+        {
+            bool rpta = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spuSUX_ActualizarEtapaET", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Etapa", vEtapa);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", IdsExpedientes);               
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
+                cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
+                oCon.Open();
+                cmd.ExecuteNonQuery();
+                rpta = Convert.ToBoolean(cmd.Parameters["@rpta"].Value);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return rpta;
         }
     }
 }

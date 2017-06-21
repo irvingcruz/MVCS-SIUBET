@@ -13,7 +13,7 @@ namespace BusinessLogic
     {
         private SqlConnection oCon;
 
-        public List<BEExpediente> fnListarExpedientes(int snip, string numeroHT, string estado, int pageNumber,int pageSize, ref int totalRows, ref int totalRowsFilter) {
+        public List<BEExpediente> fnListarExpedientes(int snip, string numeroHT, string estado, string etapa, int pageNumber,int pageSize, ref int totalRows, ref int totalRowsFilter) {
             try {
                 oCon = BLConexion.SIUBET();
                 DAExpedientes obj = new DAExpedientes(oCon);
@@ -21,6 +21,7 @@ namespace BusinessLogic
                 _oExp.Snip = snip;
                 _oExp.NumeroHT = numeroHT;
                 _oExp.Estado = estado;
+                _oExp.Etapa = etapa;
                 List<BEExpediente> resultado = obj.fnListarExpedientes(_oExp);
                 totalRows = resultado.Count();
                 totalRowsFilter = resultado.Count();
@@ -96,6 +97,39 @@ namespace BusinessLogic
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize).ToList();
                 return resultado;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public bool fnInsertarUpdateExpediente(BEExpediente oExp, string vUsuario) {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAExpedientes obj = new DAExpedientes(oCon);
+                return obj.fnInsertarUpdateExpediente(oExp,vUsuario);                                
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public List<BEPersona> ListarSedes()
+        {
+            List<BEPersona> listado = new List<BEPersona>();
+            listado.Add(new BEPersona { IDSede = 1, Nombres = "Olaechea" });
+            listado.Add(new BEPersona { IDSede = 2, Nombres = "Callao" });
+            return listado;
+        }
+
+        public bool fnActualizarEtapaET(string vEtapa, string IdsExpedientes, string vUsuario)
+        {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAExpedientes obj = new DAExpedientes(oCon);
+                return obj.fnActualizarEtapaET(vEtapa, IdsExpedientes, vUsuario);
             }
             catch (Exception)
             {

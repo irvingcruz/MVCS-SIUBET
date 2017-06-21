@@ -20,17 +20,25 @@ namespace SIUBET.Controllers
         private string vMsgSuccess = "El registró se guardó correctamente.";
         private string vMsgFail = "Error al tratar de guadar el registro.";
         private string vMsgThrow = "Error inesperado al procesar el registro.";
+        private string vMsgUserFail = "No existe un usuario autenticado";
+        private string vMsgFileSizeFail = "Tamaño máximo del archivo 500 KB. (Archivo: ";
+        private string vMsgFileTypefail = "Solo esta permitido documentos PDF.";
         private int iMaxSizeFile = 512000; //500KB - 0.5MB
         private string vPDF = "pdf";
+        private string vUsuario = "";
 
         public ActionResult DDCrear(int id)
         {
-            ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarResponsables(), "IDResponsable", "Descripcion");
-            BEMovimiento oDD = new BEMovimiento();
-            oDD.FechaMov = DateTime.Now.ToShortDateString();
-            oDD.FechaEmision = oDD.FechaMov;
-            oDD.IDTipoMov = id; //[2]Devolución [5]Derivación
-            return PartialView(oDD);
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarResponsables(), "IDResponsable", "Descripcion");
+                BEMovimiento oDD = new BEMovimiento();
+                oDD.FechaMov = DateTime.Now.ToShortDateString();
+                oDD.FechaEmision = oDD.FechaMov;
+                oDD.IDTipoMov = id; //[2]Devolución [5]Derivación
+                return PartialView(oDD);
+            //}
         }
         [HttpPost]
         public ActionResult DDCrear(BEMovimiento oDD)
@@ -40,6 +48,7 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
+            vUsuario = User.Identity.Name;
             try
             {
                 if (oDD.NumeroCargo == null || oDD.NumeroCargo.Trim().Length <= 0)
@@ -69,7 +78,7 @@ namespace SIUBET.Controllers
                     var _fileName = "";
                     if (oDD.FileEmision.ContentLength > iMaxSizeFile) _fileName = oDD.FileEmision.FileName;
                     if (oDD.FileCargo.ContentLength > iMaxSizeFile) _fileName = oDD.FileCargo.FileName;
-                    result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + _fileName + ")";
+                    result.message = vMsgFileSizeFail + _fileName + ")";
                     goto Terminar;
                 }
 
@@ -78,12 +87,13 @@ namespace SIUBET.Controllers
                 var fileExtCargo = System.IO.Path.GetExtension(oDD.FileCargo.FileName).Substring(1);
                 if (!supportedTypes.Contains(fileExtEmision) || !supportedTypes.Contains(fileExtCargo))
                 {
-                    result.message = "Solo esta permitido documentos PDF.";
+                    result.message = vMsgFileTypefail;
                     goto Terminar;
                 }
 
                 oDD.ExtensionFile = Path.GetExtension(oDD.FileEmision.FileName);
-                rpta = new BLMovimientos().fnInsertarMovDD(oDD);
+                
+                rpta = new BLMovimientos().fnInsertarMovDD(oDD,  vUsuario);
 
                 if (rpta)
                 {
@@ -111,15 +121,21 @@ namespace SIUBET.Controllers
         }
         public ActionResult DDIndex()
         {
-            return View();
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+                return View();
         }                
         public ActionResult DDRecepcionar(int id)
         {
-            BEMovimiento oDD = new BEMovimiento();
-            oDD.IDMovimiento = id;
-            oDD.FechaFinal = DateTime.Now.ToShortDateString();
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                BEMovimiento oDD = new BEMovimiento();
+                oDD.IDMovimiento = id;
+                oDD.FechaFinal = DateTime.Now.ToShortDateString();
 
-            return PartialView(oDD);
+                return PartialView(oDD);
+            //}
         }
         [HttpPost]
         public ActionResult DDRecepcionar(BEMovimiento oDD)
@@ -128,7 +144,7 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            //string message = "";
+            vUsuario = User.Identity.Name;
             try
             {
                 if (oDD.FileFinal == null) {
@@ -137,7 +153,7 @@ namespace SIUBET.Controllers
                 }
 
                 oDD.ExtensionFile = Path.GetExtension(oDD.FileFinal.FileName);
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oDD);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oDD, vUsuario);
 
                 if (rpta)
                 {
@@ -187,31 +203,41 @@ namespace SIUBET.Controllers
         }
         public ActionResult PreIndex()
         {
-            return View();
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+                return View();
         }
         public ActionResult PreCrear(string ets) //ExpdientesTécnicos (1|2|..|n)
-        {            
-            BEMovimiento oPrestamo = new BEMovimiento();
-            oPrestamo.ET_selected_P = ets;
-            oPrestamo.FechaMov = DateTime.Now.ToShortDateString();
-            oPrestamo.FechaEmision = oPrestamo.FechaMov;
-            oPrestamo.Plazo = 15;
-            oPrestamo.IDTipoMov = 4; //Préstamos        
-            return PartialView(oPrestamo);
+        {
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                BEMovimiento oPrestamo = new BEMovimiento();
+                oPrestamo.ET_selected_P = ets;
+                oPrestamo.FechaMov = DateTime.Now.ToShortDateString();
+                oPrestamo.FechaEmision = oPrestamo.FechaMov;
+                oPrestamo.Plazo = 15;
+                oPrestamo.IDTipoMov = 4; //Préstamos        
+                return PartialView(oPrestamo);
+            //}
         }
         public ActionResult PreEditar(int id) {
-            BEMovimiento oPrestamo = new BEMovimiento();
-            oPrestamo = new BLMovimientos().fnObtenerMovimiento(id);
-            return PartialView("PreCrear", oPrestamo);
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                BEMovimiento oPrestamo = new BEMovimiento();
+                oPrestamo = new BLMovimientos().fnObtenerMovimiento(id);
+                return PartialView("PreCrear", oPrestamo);
+            //}
         }
         [HttpPost]
         public ActionResult PreCrear(BEMovimiento oPrestamo)
         {
-
             if (!Request.IsAjaxRequest()) return null;
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
+            vUsuario = User.Identity.Name;
             try
             {
                 if (oPrestamo.Ing_Evaluador == null || oPrestamo.Ing_Evaluador.Trim().Length <= 0)
@@ -230,7 +256,7 @@ namespace SIUBET.Controllers
 
                     if (oPrestamo.FileCargo.ContentLength > iMaxSizeFile)
                     {
-                        result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + oPrestamo.FileCargo.FileName + ")";
+                        result.message = vMsgFileSizeFail + oPrestamo.FileCargo.FileName + ")";
                         goto Terminar;
                     }
 
@@ -238,14 +264,14 @@ namespace SIUBET.Controllers
                     var fileExtCargo = System.IO.Path.GetExtension(oPrestamo.FileCargo.FileName).Substring(1);
                     if (!supportedTypes.Contains(fileExtCargo))
                     {
-                        result.message = "Solo esta permitido documentos PDF.";
+                        result.message = vMsgFileTypefail;
                         goto Terminar;
                     }
 
                     oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
                 }
                
-                rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo);
+                rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, vUsuario);
 
                 if (rpta)
                 {
@@ -274,12 +300,14 @@ namespace SIUBET.Controllers
         }
         public ActionResult PreRetornar(int id)
         {
-
-            BEMovimiento oDevolucion = new BEMovimiento();
-            oDevolucion.IDMovimiento = id;
-            oDevolucion.FechaFinal = DateTime.Now.ToShortDateString();
-
-            return PartialView(oDevolucion);
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                BEMovimiento oDevolucion = new BEMovimiento();
+                oDevolucion.IDMovimiento = id;
+                oDevolucion.FechaFinal = DateTime.Now.ToShortDateString();
+                return PartialView(oDevolucion);
+            //}
         }
         [HttpPost]
         public ActionResult PreRetornar(BEMovimiento oPrestamo)
@@ -288,6 +316,7 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
+            vUsuario = User.Identity.Name;
             try
             {
                 if (oPrestamo.FileFinal == null)
@@ -303,7 +332,7 @@ namespace SIUBET.Controllers
 
                 if (oPrestamo.FileFinal.ContentLength > iMaxSizeFile)
                 {                    
-                    result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + oPrestamo.FileFinal.FileName + ")";
+                    result.message = vMsgFileSizeFail + oPrestamo.FileFinal.FileName + ")";
                     goto Terminar;
                 }
 
@@ -311,12 +340,12 @@ namespace SIUBET.Controllers
                 var fileExtEmision = System.IO.Path.GetExtension(oPrestamo.FileFinal.FileName).Substring(1);                
                 if (!supportedTypes.Contains(fileExtEmision))
                 {
-                    result.message = "Solo esta permitido documentos PDF.";
+                    result.message = vMsgFileTypefail;
                     goto Terminar;
                 }
 
                 oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileFinal.FileName);
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oPrestamo);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oPrestamo, vUsuario);
 
                 if (rpta)
                 {
@@ -344,15 +373,18 @@ namespace SIUBET.Controllers
             return new JsonResult { Data = result };
         }
         [HttpPost]
-        public ActionResult AnularMovimiento(int IDMovimiento, string vMotivo, int IDTipoMov) {
+        public ActionResult AnularMovimiento(int IDMovimiento, string vMotivo, int IDTipoMov)
+        {
             if (!Request.IsAjaxRequest()) return null;
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
+            vUsuario = User.Identity.Name;
+
             try
             {
-                BEMovimiento oMov = new BEMovimiento(){ IDMovimiento = IDMovimiento, Motivo = vMotivo };
-                rpta = new BLMovimientos().fnAnularMovimiento(oMov);
+                BEMovimiento oMov = new BEMovimiento() { IDMovimiento = IDMovimiento, Motivo = vMotivo };
+                rpta = new BLMovimientos().fnAnularMovimiento(oMov, vUsuario);
                 switch (IDTipoMov)
                 {
                     case 2:
@@ -361,42 +393,56 @@ namespace SIUBET.Controllers
                     case 4:
                         result.message = rpta ? "El Préstamo se anuló correctamente" : "No se puede anular el préstamo.";
                         break;
-                }                                       
-                
+                }
+
             }
             catch (Exception)
             {
                 result.message = vMsgThrow;
             }
+
+
             result.items = null;
             result.success = rpta;
             //result.message = message;
             return new JsonResult { Data = result };
         }
         public ActionResult TIndex() {
-            return View();
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+                return View();
         }
         public ActionResult TCrear(string ets) {
-            BEMovimiento oTransf = new BEMovimiento();
-            oTransf.ET_selected_T = ets;
-            oTransf.FechaEmision = DateTime.Now.ToShortDateString();
-            oTransf.IDTipoMov = 1; //Transferencias
-            return PartialView(oTransf);
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                BEMovimiento oTransf = new BEMovimiento();
+                oTransf.ET_selected_T = ets;
+                oTransf.FechaEmision = DateTime.Now.ToShortDateString();
+                oTransf.IDTipoMov = 1; //Transferencias
+                return PartialView(oTransf);
+            //}
         }
         public ActionResult TEditar(int id)
         {
-            BEMovimiento oTransf = new BEMovimiento();
-            oTransf = new BLMovimientos().fnObtenerMovimiento(id);
-            oTransf.Responsable = oTransf.UndEjec_CAC;
-            oTransf.ET_selected_T = oTransf.ET_selected_P;
-            return PartialView("TCrear", oTransf);
+            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
+            //else
+            //{
+                BEMovimiento oTransf = new BEMovimiento();
+                oTransf = new BLMovimientos().fnObtenerMovimiento(id);
+                oTransf.Responsable = oTransf.UndEjec_CAC;
+                oTransf.ET_selected_T = oTransf.ET_selected_P;
+                return PartialView("TCrear", oTransf);
+            //}
         }
         [HttpPost]
-        public ActionResult TCrear(BEMovimiento oTransf) {
+        public ActionResult TCrear(BEMovimiento oTransf)
+        {
             if (!Request.IsAjaxRequest()) return null;
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
+            vUsuario = User.Identity.Name;
             try
             {
                 if (oTransf.Responsable == null || oTransf.Responsable.Trim().Length <= 0)
@@ -415,7 +461,7 @@ namespace SIUBET.Controllers
 
                     if (oTransf.FileCargo.ContentLength > iMaxSizeFile)
                     {
-                        result.message = "Tamaño máximo del archivo 500 KB. (Archivo: " + oTransf.FileCargo.FileName + ")";
+                        result.message = vMsgFileSizeFail + oTransf.FileCargo.FileName + ")";
                         goto Terminar;
                     }
 
@@ -423,14 +469,14 @@ namespace SIUBET.Controllers
                     var fileExtCargo = System.IO.Path.GetExtension(oTransf.FileCargo.FileName).Substring(1);
                     if (!supportedTypes.Contains(fileExtCargo))
                     {
-                        result.message = "Solo esta permitido documentos PDF.";
+                        result.message = vMsgFileTypefail;
                         goto Terminar;
                     }
 
                     oTransf.ExtensionFile = Path.GetExtension(oTransf.FileCargo.FileName);
                 }
 
-                rpta = new BLMovimientos().fnInsertarMovTransferencia(oTransf);
+                rpta = new BLMovimientos().fnInsertarMovTransferencia(oTransf, vUsuario);
 
                 if (rpta)
                 {

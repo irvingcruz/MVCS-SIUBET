@@ -10,51 +10,38 @@ using System.Web.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.IO;
+using System.Web.Security;
 
 namespace SIUBET.Controllers
 {
-    [Authorize]
+    [Authorize]    
     public class ExpedientesController : Controller
     {
+        private string vMsgSuccess = "El registró se guardó correctamente.";
+        private string vMsgFail = "Error al tratar de guadar el registro.";
+        private string vMsgThrow = "Error inesperado al procesar el registro.";
+        private string vUsuario = "";
+
         // GET: Expedientes       
         public ActionResult Index()
         {
-            //ExcelPackage pck = new ExcelPackage();
-            //var ws = pck.Workbook.Worksheets.Add("Sample1");
-
-            //ws.Cells["A1"].Value = "Sample 1";
-            //ws.Cells["A1"].Style.Font.Bold = true;
-            //var shape = ws.Drawings.AddShape("Shape1", eShapeStyle.Rect);
-            //shape.SetPosition(50, 200);
-            //shape.SetSize(200, 100);
-            //shape.Text = "Sample 1 saves to the Response.OutputStream";
-
-            //pck.SaveAs(Response.OutputStream);
-            //Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            //Response.AddHeader("content-disposition", "attachment;  filename=Sample1.xlsx");
-
-            //============
-
-            //string filePath = Server.MapPath("~/Content/ExcelReport.xlsx");
-            //FileInfo Files = new FileInfo(filePath);
-            //ExcelPackage excel = new ExcelPackage();
-            //var sheetCreate = excel.Workbook.Worksheets.Add("Cargo");
-            //sheetCreate.Cells[1, 1].Value = "Hola Mundo";
-            //excel.SaveAs(Response.OutputStream);
-
+            vUsuario = User.Identity.Name;
+            if (vUsuario == null || vUsuario.Length == 0) return RedirectToAction("Login", "Account");
+            //if (oUsuario == null) return RedirectToAction("Logout","Account");
+            //else
             return View();
         }
 
-
         [HttpPost]
-        public JsonResult ListadoExpedientes(int snip, string numeroHT, string estado, int pageNumber, int pageSize) {
-            
+        public JsonResult ListadoExpedientes(int snip, string numeroHT, string estado, string etapa, int pageNumber, int pageSize)
+        {
+
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
-            
+
             int totalRows = 0;
             int totalRowsFilter = 0;
-            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, estado, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
+            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, estado, etapa, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
             //Dim datosResult = New ReglaValidacionApp().ReglasVerificacionListarFiltradoPaginado(filtros, oUsuario.dni, pageIndex, take, TotalRows, TotalRowFilter)
 
 
@@ -115,7 +102,7 @@ namespace SIUBET.Controllers
 
             int totalRows = 0;
             int totalRowsFilter = 0;
-            List<BEPersona> datosResult = new BLExpedientes().fnListarPersona(Tipo);            
+            List<BEPersona> datosResult = new BLExpedientes().fnListarPersona(Tipo);
 
             result.items3 = datosResult;
             result.totalRows = totalRows;
@@ -145,5 +132,56 @@ namespace SIUBET.Controllers
 
             return new JsonResult { Data = result };
         }
+
+        public ActionResult Crear() {
+            vUsuario = User.Identity.Name;
+            if (vUsuario == null || vUsuario.Length == 0) return RedirectToAction("Login", "Account");
+
+            BEExpediente oEpx = new BEExpediente();
+            ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
+            return View(oEpx);
+        }
+        [HttpPost]
+        public ActionResult Crear(BEExpediente oExp) {
+            bool rpta = new BLExpedientes().fnInsertarUpdateExpediente(oExp, vUsuario);
+            ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
+            return View();
+        }
+
+        public ActionResult Etapa() {
+            vUsuario = User.Identity.Name;
+            if (vUsuario == null || vUsuario.Length == 0) return RedirectToAction("Login", "Account");
+            return PartialView();
+        }
+        [HttpPost]
+        public ActionResult Etapa(BEExpediente oExp) {
+            if (!Request.IsAjaxRequest()) return null;
+
+            ObjetoJson result = new ObjetoJson();
+            bool rpta = false;           
+            try
+            {
+                if (oExp.Documento == null || oExp.Documento.Length == 0)
+                {
+                    result.message = "No existen documentos para actualizar.";
+                    goto Terminar;
+                }
+
+                rpta = new BLExpedientes().fnActualizarEtapaET(oExp.Etapa, oExp.Documento, User.Identity.Name);
+
+                if (rpta) result.message = vMsgSuccess;
+                else  result.message = vMsgFail;
+            }
+            catch (Exception)
+            {
+                result.message = vMsgThrow;
+            }
+            Terminar:
+            result.items = null;
+            result.success = rpta;
+            //result.message = message;
+            return new JsonResult { Data = result };
+        }
+
     }
 }

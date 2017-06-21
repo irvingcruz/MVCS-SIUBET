@@ -1,4 +1,5 @@
 ﻿using BusinessEntity;
+using BusinessLogic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,36 +9,47 @@ using System.Web.Security;
 
 namespace SIUBET.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         // GET: Login
         [AllowAnonymous]
         public ActionResult Login(string ReturnUrl)
         {
-            BEUsuario oUsuario = new BEUsuario();
-            return PartialView(oUsuario);
+            string Usuario = User.Identity.Name;
+            if (Usuario == null || Usuario.Length == 0)
+            {
+                BEUsuario oUsuario = new BEUsuario();
+                ViewBag.ReturnUrl = ReturnUrl;
+                return PartialView(oUsuario);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Expedientes");
+            }
         }
 
         [HttpPost]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public ActionResult Login(BEUsuario oUsuario, string ReturnUrl = "") {
-            //Redirect('Expedientes/Index');
-            if (oUsuario.UserName == "siubet" && oUsuario.Password == "siubet@2017") {
-                oUsuario.Nombres = "Usuario MVCS";
+            if (new BLUsuario().fnAutenticacion(oUsuario))
+            {
                 FormsAuthentication.SetAuthCookie(oUsuario.UserName, oUsuario.Recordarme);
+                System.Web.HttpContext.Current.Session["Usuario"] = oUsuario;
                 if (Url.IsLocalUrl(ReturnUrl))
                 {
                     return Redirect(ReturnUrl);
                 }
-                else {
+                else
+                {
                     return RedirectToAction("Index", "Expedientes");
                 }
             }
             ModelState.Remove("Password");
-            return RedirectToAction("Index", "Expedientes");
+            return PartialView();
         }
-        [Authorize]
+        //[Authorize]
         public ActionResult Logout() {
             FormsAuthentication.SignOut();
             return RedirectToAction("Login","Account");

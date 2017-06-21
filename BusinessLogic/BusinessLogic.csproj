@@ -44,6 +44,7 @@
     <Compile Include="BLConexion.cs" />
     <Compile Include="BLExpedientes.cs" />
     <Compile Include="BLMovimientos.cs" />
+    <Compile Include="BLUsuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

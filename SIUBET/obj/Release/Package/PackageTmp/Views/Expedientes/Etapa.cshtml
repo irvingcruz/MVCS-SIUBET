@@ -1,0 +1,53 @@
+﻿@model BusinessEntity.BEExpediente
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmEtapa" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        <input type="hidden" name="Documento" id="Documento" value="" />
+        <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+                <label>&nbsp;</label>
+                @Html.EditorFor(model => model.Etapa, new { htmlAttributes = new { @class = "form-control", @placeholder = "Admisibilidad...!" } })
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6 text-right">
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <div>
+                    <button type="button" class="btn btn-primary btn-sm" id="btnActualizarEtapa"><span class="glyphicon glyphicon-floppy-disk"></span> Grabar</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#Documento").val(_selectedItems);
+    });
+
+    $("#btnActualizarEtapa").on("click", function () {
+        $.ajax({
+            url: $urlReal + "Expedientes/Etapa",
+            data: $("#frmEtapa").serialize(),
+            type: 'POST',
+            dataType: "json",
+            success: function (result) {
+                //console.log(result);
+                if (result.success == true) {
+                    showNotification(result.message, notificationTypes.success, 2000);
+                    popupEtapa.dxPopup("instance").hide();
+                    gridExpedientes.dxDataGrid("instance").refresh();
+                } else {
+                    showNotification(result.message, notificationTypes.warning, 2000);
+                }
+            },
+            error: function () {
+                showNotification("Error al procesar dicha operación", notificationTypes.error, 2000);
+            },
+            timeout: 500000
+        });
+    });
+</script>

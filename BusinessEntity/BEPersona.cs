@@ -10,5 +10,6 @@ namespace BusinessEntity
     {
         public int IDPersona { get; set; }
         public string Nombres { get; set; }
+        public int IDSede { get; set; }        
     }
 }

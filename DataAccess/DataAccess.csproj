@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="DAExpedientes.cs" />
     <Compile Include="DAMovimientos.cs" />
+    <Compile Include="DAUsuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

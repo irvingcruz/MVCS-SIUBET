@@ -1,0 +1,87 @@
+﻿@model BusinessEntity.BEExpediente
+
+@{
+    ViewBag.Title = "Nuevo ET";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h4 class="panel-title">Registro de Expedientes</h4>
+    </div>
+    <div class="panel-body panel-collapse collapse in" id="collapseET">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.EditorFor(model => model.IDVersion, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="row">
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Snip</label>
+                        @Html.EditorFor(model => model.Snip, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Snip, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Sección</label>
+                        @Html.EditorFor(model => model.Seccion, new { htmlAttributes = new { @class = "form-control", @placeholder = "Estudio..." } })
+                        @Html.ValidationMessageFor(model => model.Seccion, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Serie</label>
+                        @Html.EditorFor(model => model.Serie, new { htmlAttributes = new { @class = "form-control", @placeholder = "Proyecto de inversión..!" } })
+                        @Html.ValidationMessageFor(model => model.Serie, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Sub Serie</label>
+                        @Html.EditorFor(model => model.SubSerie, new { htmlAttributes = new { @class = "form-control", @placeholder = "Expediente técnico..!" } })
+                        @Html.ValidationMessageFor(model => model.SubSerie, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Numero HT</label>
+                        @Html.EditorFor(model => model.NumeroHT, new { htmlAttributes = new { @class = "form-control", @placeholder = "E-000152-2017" } })
+                        @Html.ValidationMessageFor(model => model.NumeroHT, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>N° Doc. Ingreso</label>
+                        @Html.EditorFor(model => model.NVersion, new { htmlAttributes = new { @class = "form-control", @placeholder = "Oficio N°..!" } })
+                        @Html.ValidationMessageFor(model => model.NVersion, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Sede</label>
+                       
+                        @Html.DropDownListFor(model => model.IDSede, ViewData["Sedes"] as SelectList, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Ubicación</label>
+                        @Html.EditorFor(model => model.UbiTopografica, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.UbiTopografica, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-sm" ><span class="glyphicon glyphicon-floppy-disk"></span> Grabar</button>
+                    </div>
+                </div>
+            </div>                
+        }
+    </div>
+</div>

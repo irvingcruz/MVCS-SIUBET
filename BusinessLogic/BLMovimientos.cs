@@ -12,13 +12,13 @@ namespace BusinessLogic
     public class BLMovimientos
     {
         private SqlConnection oCon;
-        public bool fnInsertarMovDD(BEMovimiento oDD)
+        public bool fnInsertarMovDD(BEMovimiento oDD, string vUsuario)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnInsertarMovDD(oDD);
+                return obj.fnInsertarMovDD(oDD,vUsuario);
             }
             catch (Exception)
             {
@@ -58,39 +58,39 @@ namespace BusinessLogic
                 throw;
             }
         }
-        public bool fnRetornaPre_RecepcionaDD(BEMovimiento oMov)
+        public bool fnRetornaPre_RecepcionaDD(BEMovimiento oMov, string vUsuario)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnRetornaPre_RecepcionaDD(oMov);
+                return obj.fnRetornaPre_RecepcionaDD(oMov,vUsuario);
             }
             catch (Exception)
             {
                 throw;
             }
         }
-        public bool fnInsertarMovPrestamo(BEMovimiento oPrestamo)
+        public bool fnInsertarMovPrestamo(BEMovimiento oPrestamo, string vUsuario)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnInsertarMovPrestamo(oPrestamo);
+                return obj.fnInsertarMovPrestamo(oPrestamo,vUsuario);
             }
             catch (Exception)
             {
                 throw;
             }
         }
-        public bool fnAnularMovimiento(BEMovimiento oMov)
+        public bool fnAnularMovimiento(BEMovimiento oMov, string vUsuario)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnAnularMovimiento(oMov);
+                return obj.fnAnularMovimiento(oMov,vUsuario);
             }
             catch (Exception)
             {
@@ -127,14 +127,13 @@ namespace BusinessLogic
                 throw;
             }
         }
-
-        public bool fnInsertarMovTransferencia(BEMovimiento oTransf)
+        public bool fnInsertarMovTransferencia(BEMovimiento oTransf, string vUsuario)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                return obj.fnInsertarMovTransferencia(oTransf);
+                return obj.fnInsertarMovTransferencia(oTransf,vUsuario);
             }
             catch (Exception)
             {

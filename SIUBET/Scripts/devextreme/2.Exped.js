@@ -14,6 +14,12 @@
         { "ID": 5, "Name": "DERIVADOS" },      
 	];
 
+    var etapas = [
+        { "ID": 0, "Name": "-- TODOS --" },
+        { "ID": 1, "Name": "ADMISIBILIDAD" },
+        { "ID": 2, "Name": "LEGIBILIDAD" },
+        { "ID": 3, "Name": "CALIDAD" },
+    ];
 	var cboEstado = $("#cboEstado").dxSelectBox({
 	    dataSource: new DevExpress.data.ArrayStore({
 	        data: estados,
@@ -22,6 +28,15 @@
 	    displayExpr: "Name",
 	    valueExpr: "ID",
 	    value: estados[0].ID,
+	});
+	var cboEtapa = $("#cboEtapa").dxSelectBox({
+	    dataSource: new DevExpress.data.ArrayStore({
+	        data: etapas,
+	        key: "ID"
+	    }),
+	    displayExpr: "Name",
+	    valueExpr: "ID",
+	    value: etapas[0].ID,
 	});
 
 	function fnLimpiarFiltros() {
@@ -39,6 +54,26 @@
 	});
 
 	_selectedItems = "";
+
+    function fnOpenPopupEtapa(){
+        if (_selectedItems == "") {
+            showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
+            return;
+        }
+
+        popupEtapa = $("#popup-etapa").dxPopup({
+            showTitle: true,
+            title: "Actualizar Etapa de los Documentos",
+            width: 400,
+            height: "auto",
+            contentTemplate: function () {
+                var $pageContent = $("<span />");
+                return $pageContent.load($urlReal + 'Expedientes/Etapa')
+            },
+            showCloseButton: true,
+        });
+        popupEtapa.dxPopup("instance").show();
+    }
 
 	function fnOpenPopupDD(IDTipoMov) {
 	    //console.log(IDTipoMov);
@@ -59,7 +94,7 @@
 	        },
 	        showCloseButton: true,
 	    });
-	    popupDD.dxPopup("instance").show();
+	    popupDD.dxPopup("instance").show();	    
 	}
 
 	function fnOpenPopupPrestamo() {
@@ -114,6 +149,7 @@
 			{ dataField: "NombreProyecto", caption: "Proyecto", width: 300, },
             { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
 			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
+            { dataField: "Etapa", caption: "Etapa", alignment: "center", width: 100, },
             { dataField: "Estado", caption: "Estado Actual", alignment: "center", width: 250, },
             { dataField: "UbiTopografica", caption: "U.Topográfica (E:C:B) | (PQ:PO)", width: 200, },
 			//{ dataField: "Activo", dataType: "boolean", alignment: "center", },
@@ -128,6 +164,19 @@
 			        $('<div />').appendTo(container)
 					.dxToolbar({
 					    items: [
+							{
+							    location: 'after',
+							    widget: 'dxButton',
+							    locateInMenu: 'auto',
+							    //disabled: item.Vincular == false,
+							    options: {
+							        icon: "glyphicon glyphicon-edit",
+							        text: "Actualizar Etapa",
+							        onClick: function () {
+							            fnOpenPopupEtapa();
+							        }
+							    }
+							},
 							{
 							    location: 'after',
 							    widget: 'dxButton',
@@ -189,7 +238,7 @@
 							            fnOpenPopupHistorial(item.IDVersion);
 							        }
 							    }
-							},
+							},                            
 					    ]
 					});
 			    }
@@ -286,6 +335,7 @@
 				if (args.snip == "") args.snip = 0;
 				args.numeroHT = txtNumeroHT.dxTextBox("instance").option("value");
 				args.estado = cboEstado.dxSelectBox("instance").option("value");
+				args.etapa = cboEtapa.dxSelectBox("instance").option("value");
 				args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientes.dxDataGrid("instance")._options.paging.pageIndex + 1;
 				args.pageSize = loadOptions.take || 10;
 

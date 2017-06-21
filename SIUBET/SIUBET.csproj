@@ -323,6 +323,8 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Content\mi.estilo.css" />
+    <Content Include="Views\Expedientes\Crear.cshtml" />
+    <Content Include="Views\Expedientes\Etapa.cshtml" />
     <None Include="Views\IncludePartials\PopupAnular.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

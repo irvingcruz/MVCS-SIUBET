@@ -6,20 +6,20 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+//using System.Web.Mvc;
 
 namespace DataAccess
 {
     public class DAMovimientos
     {
         SqlConnection oCon;
-        BEUsuario oUsuario = new BEUsuario();
         public DAMovimientos(SqlConnection _oCon)
         {
             this.oCon = _oCon;
-            
         }
 
-        public bool fnInsertarMovDD(BEMovimiento oDD) {
+        public bool fnInsertarMovDD(BEMovimiento oDD, string vUsuario) {
             bool rpta = false;
             try
             {
@@ -34,7 +34,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@Observaciones", oDD.Observaciones);
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oDD.ET_selected_D);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oDD.ExtensionFile);
-                cmd.Parameters.AddWithValue("@Usuario", oUsuario.UserName);
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
@@ -138,7 +138,7 @@ namespace DataAccess
             return listado;
         }
 
-        public bool fnRetornaPre_RecepcionaDD(BEMovimiento oMov)
+        public bool fnRetornaPre_RecepcionaDD(BEMovimiento oMov, string vUsuario)
         {
             bool rpta = false;
             try
@@ -149,7 +149,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@FechaFinal", oMov.FechaFinal);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oMov.ExtensionFile);
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oMov.ET_selected_P);
-                cmd.Parameters.AddWithValue("@Usuario", "irving");
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
@@ -169,7 +169,7 @@ namespace DataAccess
             return rpta;
         }
 
-        public bool fnInsertarMovPrestamo(BEMovimiento oPrestamo) {
+        public bool fnInsertarMovPrestamo(BEMovimiento oPrestamo, string vUsuario) {
             bool rpta = false;
             try
             {
@@ -184,7 +184,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@Observaciones", oPrestamo.Observaciones);                
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected_P);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oPrestamo.ExtensionFile);
-                cmd.Parameters.AddWithValue("@Usuario", "irving");
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
@@ -204,7 +204,7 @@ namespace DataAccess
             }
             return rpta;
         }
-        public bool fnAnularMovimiento(BEMovimiento oMov)
+        public bool fnAnularMovimiento(BEMovimiento oMov, string vUsuario)
         {
             bool rpta = false;
             try
@@ -213,7 +213,7 @@ namespace DataAccess
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@IDMovimiento", oMov.IDMovimiento);
                 cmd.Parameters.AddWithValue("@Motivo", oMov.Motivo);
-                cmd.Parameters.AddWithValue("@Usuario", "irving");
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 oCon.Open();
 
@@ -305,7 +305,7 @@ namespace DataAccess
             }
             return listado;
         }
-        public bool fnInsertarMovTransferencia(BEMovimiento oPrestamo)
+        public bool fnInsertarMovTransferencia(BEMovimiento oPrestamo, string vUsuario)
         {
             bool rpta = false;
             try
@@ -319,7 +319,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@Observaciones", oPrestamo.Observaciones);
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected_T);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oPrestamo.ExtensionFile);
-                cmd.Parameters.AddWithValue("@Usuario", "irving");
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
                 oCon.Open();
