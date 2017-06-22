@@ -159,7 +159,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Global.cs" />
     <Compile Include="Models\ObjetoJson.cs" />
+    <Compile Include="Models\MyRoleProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +197,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.x.css" />
+    <Content Include="img\access-denied.jpg" />
     <Content Include="img\img-LogoMVCS.png" />
     <Content Include="Scripts\ai.0.22.9-build00167.js" />
     <Content Include="Scripts\ai.0.22.9-build00167.min.js" />
@@ -325,6 +328,7 @@
     <Content Include="Content\mi.estilo.css" />
     <Content Include="Views\Expedientes\Crear.cshtml" />
     <Content Include="Views\Expedientes\Etapa.cshtml" />
+    <Content Include="Views\Account\AccessDenied.cshtml" />
     <None Include="Views\IncludePartials\PopupAnular.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -354,8 +358,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Uploads\D\" />
-    <Folder Include="Uploads\P\" />
+    <Folder Include="Uploads\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

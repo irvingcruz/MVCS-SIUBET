@@ -17,16 +17,10 @@ namespace SIUBET.Controllers
     [Authorize]    
     public class ExpedientesController : Controller
     {
-        private string vMsgSuccess = "El registró se guardó correctamente.";
-        private string vMsgFail = "Error al tratar de guadar el registro.";
-        private string vMsgThrow = "Error inesperado al procesar el registro.";
-        private string vUsuario = "";
 
         // GET: Expedientes       
         public ActionResult Index()
         {
-            vUsuario = User.Identity.Name;
-            if (vUsuario == null || vUsuario.Length == 0) return RedirectToAction("Login", "Account");
             //if (oUsuario == null) return RedirectToAction("Logout","Account");
             //else
             return View();
@@ -133,24 +127,59 @@ namespace SIUBET.Controllers
             return new JsonResult { Data = result };
         }
 
+        [Authorize(Roles = "1")]
         public ActionResult Crear() {
-            vUsuario = User.Identity.Name;
-            if (vUsuario == null || vUsuario.Length == 0) return RedirectToAction("Login", "Account");
-
             BEExpediente oEpx = new BEExpediente();
             ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
             return View(oEpx);
         }
         [HttpPost]
         public ActionResult Crear(BEExpediente oExp) {
-            bool rpta = new BLExpedientes().fnInsertarUpdateExpediente(oExp, vUsuario);
+            if (!ModelState.IsValid) {
+                goto Terminar;
+            }
+
+            ViewBag.Alerta = "danger";
+            
+            string[] ECB = oExp.UbicacionECB.Split(Convert.ToChar(":"));
+
+            if (ECB.Length != 3) {
+                ViewBag.Mensaje = "Debe ingresar una ubicación (E:C:B) válida.";
+                goto Terminar;
+            }
+
+            if (oExp.UbicacionPP != null && oExp.UbicacionPP.Trim().Length > 0) {
+                string[] PP = oExp.UbicacionPP.Split(Convert.ToChar(":"));
+                if (PP.Length != 2)
+                {
+                    ViewBag.Mensaje = "Debe ingresar una ubicación (PQ:PO) válida.";
+                    goto Terminar;
+                }
+            }
+
+            bool rpta = new BLExpedientes().fnInsertarUpdateExpediente(oExp, User.Identity.Name);
+            if (rpta)
+            {
+                ViewBag.Mensaje = Global.vMsgSuccess;
+                ViewBag.Alerta = "success";
+            }
+            else ViewBag.Mensaje = Global.vMsgFail;
+
+            Terminar:
             ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
             return View();
         }
 
+        [Authorize(Roles = "1")]
+        public ActionResult Editar(int id)
+        {
+            BEExpediente oEpx = new BEExpediente();
+            oEpx = new BLExpedientes().fnObtenerExpediente(id);
+            ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
+            return View("Crear",oEpx);
+        }
+
         public ActionResult Etapa() {
-            vUsuario = User.Identity.Name;
-            if (vUsuario == null || vUsuario.Length == 0) return RedirectToAction("Login", "Account");
             return PartialView();
         }
         [HttpPost]
@@ -169,12 +198,12 @@ namespace SIUBET.Controllers
 
                 rpta = new BLExpedientes().fnActualizarEtapaET(oExp.Etapa, oExp.Documento, User.Identity.Name);
 
-                if (rpta) result.message = vMsgSuccess;
-                else  result.message = vMsgFail;
+                if (rpta) result.message = Global.vMsgSuccess;
+                else  result.message = Global.vMsgFail;
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
             Terminar:
             result.items = null;

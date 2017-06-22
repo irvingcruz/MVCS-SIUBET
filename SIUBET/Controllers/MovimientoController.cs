@@ -17,15 +17,6 @@ namespace SIUBET.Controllers
     [Authorize]
     public class MovimientoController : Controller
     {
-        private string vMsgSuccess = "El registró se guardó correctamente.";
-        private string vMsgFail = "Error al tratar de guadar el registro.";
-        private string vMsgThrow = "Error inesperado al procesar el registro.";
-        private string vMsgUserFail = "No existe un usuario autenticado";
-        private string vMsgFileSizeFail = "Tamaño máximo del archivo 500 KB. (Archivo: ";
-        private string vMsgFileTypefail = "Solo esta permitido documentos PDF.";
-        private int iMaxSizeFile = 512000; //500KB - 0.5MB
-        private string vPDF = "pdf";
-        private string vUsuario = "";
 
         public ActionResult DDCrear(int id)
         {
@@ -48,7 +39,7 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            vUsuario = User.Identity.Name;
+
             try
             {
                 if (oDD.NumeroCargo == null || oDD.NumeroCargo.Trim().Length <= 0)
@@ -73,27 +64,27 @@ namespace SIUBET.Controllers
                     goto Terminar;
                 }
 
-                if (oDD.FileEmision.ContentLength > iMaxSizeFile || oDD.FileCargo.ContentLength > iMaxSizeFile)
+                if (oDD.FileEmision.ContentLength > Global.iMaxSizeFile || oDD.FileCargo.ContentLength > Global.iMaxSizeFile)
                 {
                     var _fileName = "";
-                    if (oDD.FileEmision.ContentLength > iMaxSizeFile) _fileName = oDD.FileEmision.FileName;
-                    if (oDD.FileCargo.ContentLength > iMaxSizeFile) _fileName = oDD.FileCargo.FileName;
-                    result.message = vMsgFileSizeFail + _fileName + ")";
+                    if (oDD.FileEmision.ContentLength > Global.iMaxSizeFile) _fileName = oDD.FileEmision.FileName;
+                    if (oDD.FileCargo.ContentLength > Global.iMaxSizeFile) _fileName = oDD.FileCargo.FileName;
+                    result.message = Global.vMsgFileSizeFail + _fileName + ")";
                     goto Terminar;
                 }
 
-                var supportedTypes = new[] { vPDF };
+                var supportedTypes = new[] { Global.vPDF };
                 var fileExtEmision = System.IO.Path.GetExtension(oDD.FileEmision.FileName).Substring(1);
                 var fileExtCargo = System.IO.Path.GetExtension(oDD.FileCargo.FileName).Substring(1);
                 if (!supportedTypes.Contains(fileExtEmision) || !supportedTypes.Contains(fileExtCargo))
                 {
-                    result.message = vMsgFileTypefail;
+                    result.message = Global.vMsgFileTypefail;
                     goto Terminar;
                 }
 
                 oDD.ExtensionFile = Path.GetExtension(oDD.FileEmision.FileName);
                 
-                rpta = new BLMovimientos().fnInsertarMovDD(oDD,  vUsuario);
+                rpta = new BLMovimientos().fnInsertarMovDD(oDD,  User.Identity.Name);
 
                 if (rpta)
                 {
@@ -101,17 +92,17 @@ namespace SIUBET.Controllers
                     string adjuntoFileCargo = oDD.Archivo + "-S" + Path.GetExtension(oDD.FileCargo.FileName);
                     oDD.FileEmision.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileEmision));
                     oDD.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
-                    result.message = vMsgSuccess;
+                    result.message = Global.vMsgSuccess;
                 }
                 else
                 {
-                    result.message = vMsgFail;
+                    result.message = Global.vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
             Terminar:
             result.items = null;
@@ -144,7 +135,6 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            vUsuario = User.Identity.Name;
             try
             {
                 if (oDD.FileFinal == null) {
@@ -153,7 +143,7 @@ namespace SIUBET.Controllers
                 }
 
                 oDD.ExtensionFile = Path.GetExtension(oDD.FileFinal.FileName);
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oDD, vUsuario);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oDD, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -162,17 +152,17 @@ namespace SIUBET.Controllers
 
                     string adjuntoFileFinal = oDD.Archivo + "-R" + Path.GetExtension(oDD.FileFinal.FileName);
                     oDD.FileFinal.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileFinal));
-                    result.message = vMsgSuccess;
+                    result.message = Global.vMsgSuccess;
                 }
                 else
                 {
-                    result.message = vMsgFail;
+                    result.message = Global.vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
             Terminar:
             result.items = null;
@@ -237,7 +227,6 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            vUsuario = User.Identity.Name;
             try
             {
                 if (oPrestamo.Ing_Evaluador == null || oPrestamo.Ing_Evaluador.Trim().Length <= 0)
@@ -254,24 +243,24 @@ namespace SIUBET.Controllers
                         goto Terminar;
                     }
 
-                    if (oPrestamo.FileCargo.ContentLength > iMaxSizeFile)
+                    if (oPrestamo.FileCargo.ContentLength > Global.iMaxSizeFile)
                     {
-                        result.message = vMsgFileSizeFail + oPrestamo.FileCargo.FileName + ")";
+                        result.message = Global.vMsgFileSizeFail + oPrestamo.FileCargo.FileName + ")";
                         goto Terminar;
                     }
 
-                    var supportedTypes = new[] { vPDF };
+                    var supportedTypes = new[] { Global.vPDF };
                     var fileExtCargo = System.IO.Path.GetExtension(oPrestamo.FileCargo.FileName).Substring(1);
                     if (!supportedTypes.Contains(fileExtCargo))
                     {
-                        result.message = vMsgFileTypefail;
+                        result.message = Global.vMsgFileTypefail;
                         goto Terminar;
                     }
 
                     oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
                 }
                
-                rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, vUsuario);
+                rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -280,17 +269,17 @@ namespace SIUBET.Controllers
                         string adjuntoFileCargo = oPrestamo.Archivo + "-S" + Path.GetExtension(oPrestamo.FileCargo.FileName);
                         oPrestamo.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
                     }
-                    result.message = vMsgSuccess;
+                    result.message = Global.vMsgSuccess;
                 }
                 else
                 {
-                    result.message = vMsgFail;
+                    result.message = Global.vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
             Terminar:
             result.items = null;
@@ -316,7 +305,6 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            vUsuario = User.Identity.Name;
             try
             {
                 if (oPrestamo.FileFinal == null)
@@ -330,22 +318,22 @@ namespace SIUBET.Controllers
                     goto Terminar;
                 }
 
-                if (oPrestamo.FileFinal.ContentLength > iMaxSizeFile)
+                if (oPrestamo.FileFinal.ContentLength > Global.iMaxSizeFile)
                 {                    
-                    result.message = vMsgFileSizeFail + oPrestamo.FileFinal.FileName + ")";
+                    result.message = Global.vMsgFileSizeFail + oPrestamo.FileFinal.FileName + ")";
                     goto Terminar;
                 }
 
-                var supportedTypes = new[] { vPDF };
+                var supportedTypes = new[] { Global.vPDF };
                 var fileExtEmision = System.IO.Path.GetExtension(oPrestamo.FileFinal.FileName).Substring(1);                
                 if (!supportedTypes.Contains(fileExtEmision))
                 {
-                    result.message = vMsgFileTypefail;
+                    result.message = Global.vMsgFileTypefail;
                     goto Terminar;
                 }
 
                 oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileFinal.FileName);
-                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oPrestamo, vUsuario);
+                rpta = new BLMovimientos().fnRetornaPre_RecepcionaDD(oPrestamo, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -354,17 +342,17 @@ namespace SIUBET.Controllers
 
                     string adjuntoFileFinal = oPrestamo.Archivo + "-R" + Path.GetExtension(oPrestamo.FileFinal.FileName); ;
                     oPrestamo.FileFinal.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileFinal));
-                    result.message = vMsgSuccess;
+                    result.message = Global.vMsgSuccess;
                 }
                 else
                 {
-                    result.message = vMsgFail;
+                    result.message = Global.vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
             Terminar:
             result.items = null;
@@ -379,12 +367,10 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            vUsuario = User.Identity.Name;
-
             try
             {
                 BEMovimiento oMov = new BEMovimiento() { IDMovimiento = IDMovimiento, Motivo = vMotivo };
-                rpta = new BLMovimientos().fnAnularMovimiento(oMov, vUsuario);
+                rpta = new BLMovimientos().fnAnularMovimiento(oMov, User.Identity.Name);
                 switch (IDTipoMov)
                 {
                     case 2:
@@ -398,7 +384,7 @@ namespace SIUBET.Controllers
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
 
 
@@ -442,7 +428,6 @@ namespace SIUBET.Controllers
 
             ObjetoJson result = new ObjetoJson();
             bool rpta = false;
-            vUsuario = User.Identity.Name;
             try
             {
                 if (oTransf.Responsable == null || oTransf.Responsable.Trim().Length <= 0)
@@ -459,24 +444,24 @@ namespace SIUBET.Controllers
                         goto Terminar;
                     }
 
-                    if (oTransf.FileCargo.ContentLength > iMaxSizeFile)
+                    if (oTransf.FileCargo.ContentLength > Global.iMaxSizeFile)
                     {
-                        result.message = vMsgFileSizeFail + oTransf.FileCargo.FileName + ")";
+                        result.message = Global.vMsgFileSizeFail + oTransf.FileCargo.FileName + ")";
                         goto Terminar;
                     }
 
-                    var supportedTypes = new[] { vPDF };
+                    var supportedTypes = new[] { Global.vPDF };
                     var fileExtCargo = System.IO.Path.GetExtension(oTransf.FileCargo.FileName).Substring(1);
                     if (!supportedTypes.Contains(fileExtCargo))
                     {
-                        result.message = vMsgFileTypefail;
+                        result.message = Global.vMsgFileTypefail;
                         goto Terminar;
                     }
 
                     oTransf.ExtensionFile = Path.GetExtension(oTransf.FileCargo.FileName);
                 }
 
-                rpta = new BLMovimientos().fnInsertarMovTransferencia(oTransf, vUsuario);
+                rpta = new BLMovimientos().fnInsertarMovTransferencia(oTransf, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -485,17 +470,17 @@ namespace SIUBET.Controllers
                         string adjuntoFileCargo = oTransf.Archivo + "-S" + Path.GetExtension(oTransf.FileCargo.FileName);
                         oTransf.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
                     }
-                    result.message = vMsgSuccess;
+                    result.message = Global.vMsgSuccess;
                 }
                 else
                 {
-                    result.message = vMsgFail;
+                    result.message = Global.vMsgFail;
                 }
 
             }
             catch (Exception)
             {
-                result.message = vMsgThrow;
+                result.message = Global.vMsgThrow;
             }
             Terminar:
             result.items = null;

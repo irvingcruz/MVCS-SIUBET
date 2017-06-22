@@ -211,6 +211,17 @@ namespace DataAccess
         public bool fnInsertarUpdateExpediente(BEExpediente oExp, string vUsuario)
         {
             bool rpta = false;
+            string[] ECB = oExp.UbicacionECB.Split(Convert.ToChar(":"));
+            int UbicacionPQ = 0;
+            int UbicacionPO = 0;
+
+            if (oExp.UbicacionPP != null && oExp.UbicacionPP.Trim().Length > 0)
+            {
+                string[] PP = oExp.UbicacionPP.Split(Convert.ToChar(":"));
+                UbicacionPQ = Convert.ToInt32(PP[0]);
+                UbicacionPO = Convert.ToInt32(PP[1]);
+            }
+
             try
             {
                 SqlCommand cmd = new SqlCommand("spiuSUX_InsertarUpdateExpediente", oCon);
@@ -222,7 +233,13 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@SubSerie", oExp.SubSerie);
                 cmd.Parameters.AddWithValue("@NumeroHT", oExp.NumeroHT);
                 cmd.Parameters.AddWithValue("@DocIngreso", oExp.NVersion);
-                cmd.Parameters.AddWithValue("@Ubicacion", oExp.UbiTopografica);
+                cmd.Parameters.AddWithValue("@Etapa", oExp.Etapa);
+                cmd.Parameters.AddWithValue("@IDSede", oExp.IDSede);
+                cmd.Parameters.AddWithValue("@UbicacionE", Convert.ToInt32(ECB[0]));
+                cmd.Parameters.AddWithValue("@UbicacionC", Convert.ToInt32(ECB[1]));
+                cmd.Parameters.AddWithValue("@UbicacionB", ECB[2]);
+                cmd.Parameters.AddWithValue("@UbicacionPQ", UbicacionPQ);
+                cmd.Parameters.AddWithValue("@UbicacionPO", UbicacionPO);
                 cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 oCon.Open();
@@ -266,6 +283,45 @@ namespace DataAccess
                 oCon.Close();
             }
             return rpta;
+        }
+
+        public BEExpediente fnObtenerExpediente(int IDVersion)
+        {
+            BEExpediente oExp = new BEExpediente();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spSUX_ObtenerExpediente", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IDVersion", IDVersion);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        oExp = new BEExpediente();
+                        oExp.IDVersion = Convert.ToInt32(dr["IDVersion"]);
+                        oExp.Snip = Convert.ToInt32(dr["Snip"]);
+                        oExp.Seccion = dr["Seccion"].ToString();
+                        oExp.Serie = dr["Serie"].ToString();
+                        oExp.SubSerie = dr["SubSerie"].ToString();
+                        oExp.NumeroHT = dr["NumeroHT"].ToString();
+                        oExp.NVersion = dr["NVersion"].ToString();
+                        oExp.Etapa = dr["Etapa"].ToString();
+                        oExp.IDSede = Convert.ToInt32(dr["IDSede"]);                        
+                        oExp.UbicacionECB = dr["ECB"].ToString();
+                        oExp.UbicacionPP = dr["PP"].ToString();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return oExp;
         }
     }
 }

@@ -220,7 +220,7 @@
         },
     });
 
-    var listado = new DevExpress.data.CustomStore({
+    @*var listado = new DevExpress.data.CustomStore({
         load: function (loadOptions) {
             var deferred = $.Deferred();
             var args = {};
@@ -247,16 +247,37 @@
             return deferred.promise();
         },
 
+    });*@
+
+    var listado;
+    var args = {};
+    args.Tipo = @Model.IDTipoMov;
+    $.ajax({
+        url: $urlReal + "Expedientes/ListadoPersonas",
+        data: JSON.stringify(args),
+        type: 'POST',
+        dataType: "json",
+        async: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            listado = result.items3;
+        },
+        error: function () {
+            listado = null;
+        },
+        //timeout: 500000                
     });
 
     var cboDD = $("#cboDD").dxSelectBox({
-        dataSource: {
-            store: listado
-        },
+        //dataSource: {
+        //    store: listado
+        //},
+        items: listado,
         placeholder: "Seleccionar...",
         displayExpr: "Nombres",
         valueExpr: "Nombres",
-        //searchEnabled: true,
+        searchEnabled: true,
+        value: listado.Nombres = $("#UndEjec_CAC").val(),
         onValueChanged: function (e) {
             var ide = e.value;
             var UndEjec_CAC = $("#UndEjec_CAC");

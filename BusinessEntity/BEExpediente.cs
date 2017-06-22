@@ -36,6 +36,9 @@ namespace BusinessEntity
         public string UbiTopografica { get; set; }
         public int IDTipoMov { get; set; }
         public int IDSede { get; set; }
+        [Required(ErrorMessage = "Favor de ingresar la ubicación del ET")]
+        public string UbicacionECB { get; set; }
+        public string UbicacionPP { get; set; }
 
     }
 }

@@ -1,12 +1,13 @@
-﻿$(document).ready(function () {
-
-    $urlProtocol = window.location.protocol;
+﻿    $urlProtocol = window.location.protocol;
     $urlDomain = window.location.host;
     $localhost = $urlDomain.substr(0, 10);
     $urlReal = $urlProtocol + '//';
 
     if ($localhost == "localhost:") { $urlReal += $urlDomain + '/'; }
     else { $urlReal += $urlDomain + '/SIUBET/'; }
+$(document).ready(function () {
+
+
 
     //alert($urlReal);
     $("#logo").attr("src", $urlReal + "img/img-LogoMVCS.png");

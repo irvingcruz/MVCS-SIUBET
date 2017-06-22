@@ -25,5 +25,15 @@ namespace BusinessLogic
                 throw;
             }
         }
+
+        public BEUsuario fnObtenerUsuario(string vUsuario) {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAUsuario obj = new DAUsuario(oCon);
+                return obj.fnObtenerUsuario(vUsuario);
+            }
+            catch (Exception e) { throw e; }
+        }
     }
 }

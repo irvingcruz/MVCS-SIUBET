@@ -18,11 +18,19 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <!-- Favicon and touch icons -->
-    <link rel="shortcut icon" href="/assets/ico/favicon.ico">
+    <link rel="shortcut icon" href="~/assets/ico/favicon.ico">
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="~/assets/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="~/assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="~/assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="~/assets/ico/apple-touch-icon-57-precomposed.png">
+    <style>
+        .alerta-login {
+            background-color: #fff;
+            color: #ff0000;
+            border-radius: 5px;
+            font-family: Cambria;
+        }
+    </style>
 </head>
 <body>
     <!-- Top content -->
@@ -56,8 +64,12 @@
         <div class="form-group">
             <label class="sr-only" for="form-password">Password</label>
             @*<input type="password" name="form-password" placeholder="Password..." class="form-password form-control" id="Password">*@
-            @Html.PasswordFor(model => model.Password, new { @class = "form-password form-control", @placeholder = "Password..." } )
+            @Html.PasswordFor(model => model.Password, new { @class = "form-password form-control", @placeholder = "Password..." })
         </div>
+        <div class="form-group alerta-login">
+          @ViewBag.Mensaje
+        </div>
+
         <button type="submit" class="btn">Ingresar</button>
     </form>
 }

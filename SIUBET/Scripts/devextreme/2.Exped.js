@@ -13,7 +13,6 @@
         { "ID": 4, "Name": "EN PRESTAMO" },
         { "ID": 5, "Name": "DERIVADOS" },      
 	];
-
     var etapas = [
         { "ID": 0, "Name": "-- TODOS --" },
         { "ID": 1, "Name": "ADMISIBILIDAD" },
@@ -145,7 +144,17 @@
 			{ dataField: "Nro", caption: "#" },
 			//{ dataField: "IDVersion", caption: "ID", },
 			//{ dataField: "IDExpTecnico", caption: "IDExpTec", alignment: "center", },
-			{ dataField: "Snip", alignment: "center", },
+			//{ dataField: "Snip", alignment: "center", },
+            {
+                caption: "Snip",
+                alignment: "center",                
+                cellTemplate: function (container, options) {
+                    var item = options.data;
+                    var dato = '<span><a href="' + $urlReal + 'Expedientes/Editar/'+item.IDVersion+'" target="_blank">' + item.Snip + '</span>';
+                    dato = $(dato);                    
+                    dato.appendTo(container);
+                }
+            },
 			{ dataField: "NombreProyecto", caption: "Proyecto", width: 300, },
             { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
 			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
@@ -159,88 +168,92 @@
 			    allowHiding: false,
 			    alignment: "center",
 			    width: 35,
+                
 			    cellTemplate: function (container, options) {
 			        var item = options.data;
-			        $('<div />').appendTo(container)
-					.dxToolbar({
-					    items: [
-							{
-							    location: 'after',
-							    widget: 'dxButton',
-							    locateInMenu: 'auto',
-							    //disabled: item.Vincular == false,
-							    options: {
-							        icon: "glyphicon glyphicon-edit",
-							        text: "Actualizar Etapa",
-							        onClick: function () {
-							            fnOpenPopupEtapa();
+			        //if (item.IDTipoMov == 0) {
+			            $('<div />').appendTo(container)
+					    .dxToolbar({
+					        items: [
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        //disabled: item.Vincular == false,
+							        options: {
+							            icon: "glyphicon glyphicon-edit",
+							            text: "Actualizar Etapa",
+							            onClick: function () {
+							                fnOpenPopupEtapa();
+							            }
 							        }
-							    }
-							},
-							{
-							    location: 'after',
-							    widget: 'dxButton',
-							    locateInMenu: 'auto',
-							    options: {
-							        icon: "glyphicon glyphicon-retweet",
-							        text: "Préstamo",
-							        onClick: function () {
-							            fnOpenPopupPrestamo();
+							    },
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        options: {
+							            icon: "glyphicon glyphicon-retweet",
+							            text: "Préstamo",
+							            onClick: function () {
+							                fnOpenPopupPrestamo();
+							            }
 							        }
-							    }
 
-							},
-							{
-							    location: 'after',
-							    widget: 'dxButton',
-							    locateInMenu: 'auto',
-							    options: {
-							        icon: "glyphicon glyphicon-repeat",
-							        text: "Devolución",
-							        onClick: function () {
-							            fnOpenPopupDD(2);
+							    },
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        options: {
+							            icon: "glyphicon glyphicon-repeat",
+							            text: "Devolución",
+							            onClick: function () {
+							                fnOpenPopupDD(2);
+							            }
 							        }
-							    }
-							},
-							{
-							    location: 'after',
-							    widget: 'dxButton',
-							    locateInMenu: 'auto',
-							    options: {
-							        icon: "glyphicon glyphicon-repeat",
-							        text: "Derivación",
-							        onClick: function () {
-							            fnOpenPopupDD(5);
+							    },
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        options: {
+							            icon: "glyphicon glyphicon-repeat",
+							            text: "Derivación",
+							            onClick: function () {
+							                fnOpenPopupDD(5);
+							            }
 							        }
-							    }
-							},
-							{
-							    location: 'after',
-							    widget: 'dxButton',
-							    locateInMenu: 'auto',
-							    options: {
-							        icon: "glyphicon glyphicon-share",
-							        text: "Transferir",
-							        onClick: function () {
-							            fnOpenPopupTransferencia();
+							    },
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        options: {
+							            icon: "glyphicon glyphicon-share",
+							            text: "Transferir",
+							            onClick: function () {
+							                fnOpenPopupTransferencia();
+							            }
 							        }
-							    }
-							},
-							{
-							    location: 'after',
-							    widget: 'dxButton',
-							    locateInMenu: 'auto',
-							    //disabled: item.Vincular == false,
-							    options: {
-							        icon: "glyphicon glyphicon-th-list",
-							        text: "Ver historial",
-							        onClick: function () {
-							            fnOpenPopupHistorial(item.IDVersion);
+							    },
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        //disabled: item.Vincular == false,
+							        options: {
+							            icon: "glyphicon glyphicon-th-list",
+							            text: "Ver historial",
+							            onClick: function () {
+							                fnOpenPopupHistorial(item.IDVersion);
+							            }
 							        }
-							    }
-							},                            
-					    ]
-					});
+							    },                            
+					        ]
+					    });
+			        //}
+
 			    }
 			},
 		],
@@ -305,11 +318,11 @@
 			allowedPageSizes: [10, 20, 50, 100, 200],
 			infoText: $infoTextPaginado,
 		},
-		"export": {
-			enabled: true,
-			fileName: "Listado Expedientes",
-			allowExportSelectedData: true
-		},
+		//"export": {
+		//	enabled: true,
+		//	fileName: "Listado Expedientes",
+		//	allowExportSelectedData: true
+		//},
 		loadPanel: {
 			text: $textLoad
 		},

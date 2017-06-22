@@ -136,5 +136,20 @@ namespace BusinessLogic
                 throw;
             }
         }
+
+        public BEExpediente fnObtenerExpediente(int IDVersion)
+        {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAExpedientes obj = new DAExpedientes(oCon);
+                BEExpediente resultado = obj.fnObtenerExpediente(IDVersion);
+                return resultado;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

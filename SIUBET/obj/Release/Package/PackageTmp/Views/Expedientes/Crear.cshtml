@@ -10,10 +10,19 @@
         <h4 class="panel-title">Registro de Expedientes</h4>
     </div>
     <div class="panel-body panel-collapse collapse in" id="collapseET">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm("Crear","Expedientes",FormMethod.Post))
         {
             @Html.AntiForgeryToken()
-            @Html.EditorFor(model => model.IDVersion, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.EditorFor(model => model.IDVersion, new { htmlAttributes = new { @class = "form-control",@style = "display:none;" } })
+            {
+                if (ViewBag.Mensaje != null)
+                {
+                    <div class="alert alert-@ViewBag.Alerta">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        @ViewBag.Mensaje
+                    </div>
+                }
+            }
             <div class="row">
                 <div class="col-xs-12 col-md-3">
                     <div class="form-group">
@@ -62,16 +71,32 @@
                 </div>
                 <div class="col-xs-12 col-md-3">
                     <div class="form-group">
-                        <label>Sede</label>
-                       
-                        @Html.DropDownListFor(model => model.IDSede, ViewData["Sedes"] as SelectList, new { @class = "form-control" })
+                        <label>Etapa</label>
+                        @Html.EditorFor(model => model.Etapa, new { htmlAttributes = new { @class = "form-control", @placeholder = "Admisibilidad" } })
+                        @Html.ValidationMessageFor(model => model.Etapa, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-xs-12 col-md-3">
                     <div class="form-group">
-                        <label>Ubicación</label>
-                        @Html.EditorFor(model => model.UbiTopografica, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.UbiTopografica, "", new { @class = "text-danger" })
+                        <label>Sede</label>                       
+                        @Html.DropDownListFor(model => model.IDSede, ViewData["Sedes"] as SelectList, new { @class = "form-control" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Ubicación (E:C:B)</label>
+                        @Html.EditorFor(model => model.UbicacionECB, new { htmlAttributes = new { @class = "form-control", @placeholder = "21:A:6" } })
+                        @Html.ValidationMessageFor(model => model.UbicacionECB, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Ubicación (PQ:PO)</label>
+                        @Html.EditorFor(model => model.UbicacionPP, new { htmlAttributes = new { @class = "form-control", @placeholder = "8:4" } })
+                        @Html.ValidationMessageFor(model => model.UbicacionPP, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>

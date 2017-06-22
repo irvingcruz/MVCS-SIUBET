@@ -34,20 +34,36 @@ namespace DataAccess
                         //oMov = new BEMovimiento();
                         oUsuario.IDUsuario = Convert.ToInt32(dr["IDUsuario"]);
                         oUsuario.IDPerfil = Convert.ToInt32(dr["IDPerfil"]);
-                        oUsuario.Nombres= dr["Nombres"].ToString();
-                        rpta = true;                        
+                        oUsuario.Nombres = dr["Nombres"].ToString();
+                        rpta = true;
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception e) { throw e; }
+            finally { oCon.Close(); }
+            return rpta;
+        }
+
+        public BEUsuario fnObtenerUsuario(string vUsuario) {
+            BEUsuario oUsuario = new BEUsuario();
+            try
             {
-                throw e;
+                SqlCommand cmd = new SqlCommand("spSUX_ObtenerUsuario", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        oUsuario.IDUsuario = Convert.ToInt32(dr["IDUsuario"]);
+                        oUsuario.IDPerfil = Convert.ToInt32(dr["IDPerfil"]);
+                    }
+                }
             }
-            finally
-            {
-                oCon.Close();
-            }
-            return rpta;                    
+            catch (Exception e) { throw e; }
+            finally { oCon.Close(); }
+            return oUsuario;
         }
     }
 }
