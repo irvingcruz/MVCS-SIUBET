@@ -1,17 +1,22 @@
 ﻿<script>
-    $('#dp6').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });    
+    $('#dp7').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+    $('#dp8').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
 </script>
 @model BusinessEntity.BEMovimiento
 
-@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmT", @enctype = "multipart/form-data" }))
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "frmR", @enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
     <div class="row">
+        @Html.HiddenFor(model => model.IDMovimiento)
+        @Html.HiddenFor(model => model.IDTipoMov)
+        @Html.HiddenFor(model => model.ET_selected_P)                
+        @Html.HiddenFor(model => model.PadreHome)        
         <div class="col-xs-12 col-md-3">
             <div class="form-group">
                 <span class="control-label">Fecha Solicitud</span>
-                <div class='input-group date' id='dp6'>
+                <div class='input-group date' id='dp7'>
                     @Html.EditorFor(model => model.FechaEmision, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
@@ -19,10 +24,25 @@
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-md-4">
+        <div class="col-xs-12 col-md-3">
             <div class="form-group">
-                <label>Destino</label>
-                @Html.EditorFor(model => model.Responsable, new { htmlAttributes = new { @class = "form-control", @placeholder = "Escribir Nombre" } })
+                <span class="control-label">Fecha Entrega</span>
+                <div class='input-group date' id='dp8'>
+                    @Html.EditorFor(model => model.FechaMov, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <div class="form-group">
+                <label>Modalidad</label>
+                <div>                    
+                    <input type="checkbox" name="Modalidad[]" value="AD" /> Digital
+                    <input type="checkbox" name="Modalidad[]" value="CS" /> Copia Simple
+                    <input type="checkbox" name="Modalidad[]" value="CF" /> Copia Fedateada
+                </div>
             </div>
         </div>
     </div>
@@ -33,27 +53,29 @@
                 @Html.TextBoxFor(model => model.FileCargo, null, new { type = "file", @class = "form-control" })
             </div>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12 col-md-4">
             <div class="form-group">
-                <label>Observaciones</label>
-                @Html.TextAreaFor(model => model.Observaciones, new { @class = "form-control", @maxlength = "100" })
+                <label>Ingenieros/Otros</label>
+                <div id="cboIng"></div>
+                @Html.HiddenFor(model => model.Ing_Evaluador)
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
-                <div id="gridExpedientesSelectedTRA"></div>
-                @Html.EditorFor(model => model.ET_selected_T, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
-                @Html.EditorFor(model => model.IDTipoMov, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
-                @Html.EditorFor(model => model.IDMovimiento, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
+                <div id="gridExpedientesSelectedR"></div>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
-                <button type="button" class="btn btn-primary btn-sm" id="btnGrabarT"><span class="glyphicon glyphicon-floppy-disk"></span> Grabar</button>
+                @Html.EditorFor(model => model.Print)
+                <button type="button" class="btn btn-primary btn-sm" id="btnGrabarR"><span class="glyphicon glyphicon-floppy-disk"></span> Grabar</button>
+                @*<button type="button" class="btn btn-default btn-sm" id="btnImprimir"><span class="glyphicon glyphicon-print"></span> Imprimir Cargo</button>*@
+                <a id="btnImprimir" href="@Url.Action("PrePrintCargo/"+@Model.IDMovimiento, "Movimiento")"><span class="glyphicon glyphicon-print btn-default" aria-hidden="true" role="button"></span> Imprimir Cargo</a>
+                <button type="button" class="btn btn-primary btn-sm" id="btnGenerar"><span class="glyphicon glyphicon-floppy-disk"></span> Guardar</button>
             </div>
         </div>
     </div>
@@ -61,32 +83,50 @@
 }
 
 <script>
+    var IDMovimiento = @Model.IDMovimiento;
+    var IDTipoMov = @Model.IDTipoMov;
+    @*var IDExpSelected = @Model.ET_selected_P;*@
 
-    var IDMovimiento = @Model.IDMovimiento;    
+    var PadreHome = @Model.PadreHome;
 
-    $("#btnGrabarT").on("click", function () {
-        var _Data = new FormData(document.getElementById("frmT"));
+    //if(IDMovimiento == 0) $("#btnImprimir").addClass("disabled");
+
+    $("#btnGenerar").on("click", function(){
+        $("#Print").val(1);
+        fnGrabar();
+        $("#Print").val(0);
+    });
+
+    $("#btnGrabarR").on("click", function () {
+        fnGrabar();
+    });
+
+    function fnGrabar(){
+        var _Data = new FormData(document.getElementById("frmR"));
         $.ajax({
-            url: $urlReal + "Movimiento/TCrear",
-            //data: $("#frmDev").serialize(),
+            url: $urlReal + "Movimiento/RCrear",
             data: _Data,
             type: 'POST',
+            async: false,
             processData: false,  // tell jQuery not to process the data
             contentType: false,   // tell jQuery not to set contentType
-            //dataType: "json",
-            //contentType: "application/json; charset=utf-8",
             success: function (result) {
                 //console.log(result);
                 if (result.success == true) {
-                    showNotification(result.message, notificationTypes.success, 2000);
-                    if(IDMovimiento == 0){
-                        popupTransferencia.dxPopup("instance").hide();
-                        gridExpedientes.dxDataGrid("instance").refresh();
+                    if($("#Print").val() == 1){                       
+                        IDMovimiento = result.Movimiento.IDMovimiento;
+                        $("#IDMovimiento").val(IDMovimiento);
+                        window.location = $urlReal + "Uploads/DocGenerado.xlsx";
                     }else{
-                        popupTransferenciaEdit.dxPopup("instance").hide();
-                        gridTransferencias.dxDataGrid("instance").refresh();
-                    }
-
+                        showNotification(result.message, notificationTypes.success, 2000);
+                        if(PadreHome == 1){
+                            popupPrestamo.dxPopup("instance").hide();
+                            gridExpedientes.dxDataGrid("instance").refresh();
+                        }else{
+                            //popupPrestamoEdit.dxPopup("instance").hide();
+                            //gridPrestamos.dxDataGrid("instance").refresh();
+                        }
+                    }                                                            
                 } else {
                     showNotification(result.message, notificationTypes.warning, 2000);
                 }
@@ -95,10 +135,10 @@
                 showNotification("Error al procesar dicha operación", notificationTypes.error, 2000);
             },
             timeout: 500000
-        });
-    });
+        });    
+    }
 
-    var gridExpedientesSelected = $("#gridExpedientesSelectedTRA").dxDataGrid({
+    var gridExpedientesSelected = $("#gridExpedientesSelectedR").dxDataGrid({
         columns: [
 			{ dataField: "Nro", caption: "#" },
 			//{ dataField: "IDVersion", caption: "ID", },
@@ -152,8 +192,7 @@
 
             var deferred = $.Deferred(),
 				args = {};
-            //$("#ET_selected_P").val(id_exps_selected);
-            args.IdsExpedientes = $("#ET_selected_T").val();// id_exps_selected;
+            args.IdsExpedientes = $("#ET_selected_P").val();// IDExpSelected;
             args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientesSelected.dxDataGrid("instance")._options.paging.pageIndex + 1;
             args.pageSize = loadOptions.take || 10;
             console.log(args);
@@ -164,7 +203,6 @@
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 success: function (result) {
-                    //console.log(result)
                     $stateSearch = false;
                     $(".totalRowsFilter").text(result.totalRowsFilter)
                     $(".totalRows").text(result.totalRows)
@@ -187,5 +225,37 @@
         },
     });
 
+    var listado;
+    var args = {};
+    args.Tipo = IDTipoMov;
+    $.ajax({
+        url: $urlReal + "Expedientes/ListadoPersonas",
+        data: JSON.stringify(args),
+        type: 'POST',
+        dataType: "json",
+        async: false,
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            listado = result.items3;
+        },
+        error: function () {
+            listado = null;
+        },
+    });
+
+    cboIng = $("#cboIng").dxSelectBox({
+        items: listado,
+        placeholder: "Seleccionar...",
+        displayExpr: "Nombres",
+        valueExpr: "Nombres",
+        searchEnabled: true,
+        value: listado.Nombres = $("#Ing_Evaluador").val(),
+        onValueChanged: function (e) {
+            var ide = e.value;
+            $("#Ing_Evaluador").val(ide);
+        }
+    });
+
 </script>
+
 

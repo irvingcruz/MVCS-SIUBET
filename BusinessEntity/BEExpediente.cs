@@ -39,6 +39,7 @@ namespace BusinessEntity
         [Required(ErrorMessage = "Favor de ingresar la ubicación del ET")]
         public string UbicacionECB { get; set; }
         public string UbicacionPP { get; set; }
+        public string Priorizacion { get; set; }
 
     }
 }

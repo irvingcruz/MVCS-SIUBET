@@ -31,8 +31,12 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@IDResponsable", oDD.IDResponsable);
                 cmd.Parameters.AddWithValue("@NumeroCargo", oDD.NumeroCargo);                
                 cmd.Parameters.AddWithValue("@UndEjec_CAC", oDD.UndEjec_CAC);
+                cmd.Parameters.AddWithValue("@TipoDevolucion", oDD.TipoDevolucion);
                 cmd.Parameters.AddWithValue("@Observaciones", oDD.Observaciones);
                 cmd.Parameters.AddWithValue("@IdsExpedientes", oDD.ET_selected_D);
+                //string vFileEmision = null;
+                //if (oDD.NombreFileEmision != null && oDD.NombreFileEmision.Length > 0) vFileEmision = "ok";
+                cmd.Parameters.AddWithValue("@FileEmision", oDD.NombreFileEmision);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oDD.ExtensionFile);
                 cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
@@ -55,22 +59,24 @@ namespace DataAccess
             return rpta;
         }
 
-        public List<BERespDev> fnListarResponsables()
+        public List<BEListado> fnListarCbo(string Tipo)
         {
-            List<BERespDev> listado = new List<BERespDev>();
+            List<BEListado> listado = new List<BEListado>();
             try
             {
-                SqlCommand cmd = new SqlCommand("spSUX_ListarResponsables", oCon);
+                SqlCommand cmd = new SqlCommand("spSUX_ListarCbo", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Tipo", Tipo);
                 oCon.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                 {
                     while (dr.Read())
                     {
-                        BERespDev oResp = new BERespDev();
-                        oResp.IDResponsable = Convert.ToInt32(dr["IDResponsable"]);
-                        oResp.Descripcion= dr["Descripcion"].ToString();                       
-                        listado.Add(oResp);
+                        BEListado obj = new BEListado();
+                        obj.ID = Convert.ToInt32(dr["ID"]);
+                        obj.Codigo = Convert.ToInt32(dr["Codigo"]);
+                        obj.Descripcion= dr["Descripcion"].ToString();                       
+                        listado.Add(obj);
                     }
                 }
             }
@@ -175,7 +181,7 @@ namespace DataAccess
             {
                 SqlCommand cmd = new SqlCommand("spiSUX_InsertarMovPrestamo", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@IDMovimiento", oPrestamo.IDMovimiento);
+                cmd.Parameters.AddWithValue("@IDMovimiento", oPrestamo.IDMovimiento).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@FechaSol", oPrestamo.FechaEmision);                
                 cmd.Parameters.AddWithValue("@FechaMov", oPrestamo.FechaMov);
                 cmd.Parameters.AddWithValue("@IDTipoMov", oPrestamo.IDTipoMov);
@@ -192,6 +198,7 @@ namespace DataAccess
                 cmd.ExecuteNonQuery();
                 rpta = Convert.ToBoolean(cmd.Parameters["@rpta"].Value);
                 oPrestamo.Archivo = cmd.Parameters["@Archivo"].Value.ToString();
+                oPrestamo.IDMovimiento = Convert.ToInt32(cmd.Parameters["@IDMovimiento"].Value);
 
             }
             catch (Exception e)

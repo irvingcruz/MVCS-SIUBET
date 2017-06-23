@@ -23,7 +23,8 @@ namespace SIUBET.Controllers
             //if (oUsuario == null) return RedirectToAction("Logout", "Account");
             //else
             //{
-                ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarResponsables(), "IDResponsable", "Descripcion");
+                ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarCbo("01"), "Codigo", "Descripcion");
+                ViewData["Tipos"] = new SelectList(new BLMovimientos().fnListarCbo("02"), "Codigo", "Descripcion");
                 BEMovimiento oDD = new BEMovimiento();
                 oDD.FechaMov = DateTime.Now.ToShortDateString();
                 oDD.FechaEmision = oDD.FechaMov;
@@ -52,11 +53,11 @@ namespace SIUBET.Controllers
                     result.message = oDD.IDTipoMov == 2 ? "Seleccione ó Ingrese la Unidad Ejecutora" : "Seleccione un CAC";
                     goto Terminar;
                 }
-                if (oDD.FileEmision == null)
-                {
-                    result.message = "Debe anexar un documento para la Emisión";
-                    goto Terminar;
-                }
+                //if (oDD.FileEmision == null)
+                //{
+                //    result.message = "Debe anexar un documento para la Emisión";
+                //    goto Terminar;
+                //}
 
                 if (oDD.FileCargo == null)
                 {
@@ -64,33 +65,47 @@ namespace SIUBET.Controllers
                     goto Terminar;
                 }
 
-                if (oDD.FileEmision.ContentLength > Global.iMaxSizeFile || oDD.FileCargo.ContentLength > Global.iMaxSizeFile)
+                var fileExtEmision = "";
+                if (oDD.FileEmision != null)
                 {
-                    var _fileName = "";
-                    if (oDD.FileEmision.ContentLength > Global.iMaxSizeFile) _fileName = oDD.FileEmision.FileName;
-                    if (oDD.FileCargo.ContentLength > Global.iMaxSizeFile) _fileName = oDD.FileCargo.FileName;
+                    fileExtEmision = System.IO.Path.GetExtension(oDD.FileEmision.FileName).Substring(1);
+                    if (oDD.FileEmision.ContentLength > Global.iMaxSizeFile)
+                    {
+                        var _fileName = oDD.FileEmision.FileName;
+                        result.message = Global.vMsgFileSizeFail + _fileName + ")";
+                        goto Terminar;
+                    }
+                    oDD.NombreFileEmision = oDD.FileEmision.FileName;
+                }
+
+                if (oDD.FileCargo.ContentLength > Global.iMaxSizeFile)
+                {
+                    var _fileName = oDD.FileCargo.FileName;
                     result.message = Global.vMsgFileSizeFail + _fileName + ")";
                     goto Terminar;
                 }
 
                 var supportedTypes = new[] { Global.vPDF };
-                var fileExtEmision = System.IO.Path.GetExtension(oDD.FileEmision.FileName).Substring(1);
+
                 var fileExtCargo = System.IO.Path.GetExtension(oDD.FileCargo.FileName).Substring(1);
-                if (!supportedTypes.Contains(fileExtEmision) || !supportedTypes.Contains(fileExtCargo))
+                if ((fileExtEmision.Length > 0 && !supportedTypes.Contains(fileExtEmision)) || !supportedTypes.Contains(fileExtCargo))
                 {
                     result.message = Global.vMsgFileTypefail;
                     goto Terminar;
                 }
 
-                oDD.ExtensionFile = Path.GetExtension(oDD.FileEmision.FileName);
+                oDD.ExtensionFile = Path.GetExtension(oDD.FileCargo.FileName);
                 
                 rpta = new BLMovimientos().fnInsertarMovDD(oDD,  User.Identity.Name);
 
                 if (rpta)
                 {
-                    string adjuntoFileEmision = oDD.Archivo + "-E" + Path.GetExtension(oDD.FileEmision.FileName);
+                    if (oDD.FileEmision != null)
+                    {
+                        string adjuntoFileEmision = oDD.Archivo + "-E" + Path.GetExtension(oDD.FileEmision.FileName);
+                        oDD.FileEmision.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileEmision));
+                    }
                     string adjuntoFileCargo = oDD.Archivo + "-S" + Path.GetExtension(oDD.FileCargo.FileName);
-                    oDD.FileEmision.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileEmision));
                     oDD.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
                     result.message = Global.vMsgSuccess;
                 }
@@ -199,17 +214,14 @@ namespace SIUBET.Controllers
         }
         public ActionResult PreCrear(string ets) //ExpdientesTécnicos (1|2|..|n)
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                BEMovimiento oPrestamo = new BEMovimiento();
-                oPrestamo.ET_selected_P = ets;
-                oPrestamo.FechaMov = DateTime.Now.ToShortDateString();
-                oPrestamo.FechaEmision = oPrestamo.FechaMov;
-                oPrestamo.Plazo = 15;
-                oPrestamo.IDTipoMov = 4; //Préstamos        
-                return PartialView(oPrestamo);
-            //}
+            BEMovimiento oPrestamo = new BEMovimiento();
+            oPrestamo.ET_selected_P = ets;
+            oPrestamo.FechaMov = DateTime.Now.ToShortDateString();
+            oPrestamo.FechaEmision = oPrestamo.FechaMov;
+            oPrestamo.Plazo = 30;
+            oPrestamo.IDTipoMov = 4; //Préstamos    
+            oPrestamo.PadreHome = 1;
+            return PartialView(oPrestamo);
         }
         public ActionResult PreEditar(int id) {
             //if (oUsuario == null) return RedirectToAction("Logout", "Account");
@@ -235,7 +247,26 @@ namespace SIUBET.Controllers
                     goto Terminar;
                 }
 
-                if(oPrestamo.IDMovimiento > 0)
+                if (oPrestamo.Print == 1)
+                {
+                    rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, User.Identity.Name);
+                    if (rpta)
+                    {
+                        rpta = GenerarDocumentoExcel(oPrestamo.IDMovimiento);
+                        if (rpta)
+                        {
+                            result.Movimiento = oPrestamo;
+                            goto Terminar;
+                        }
+                        else
+                        {
+                            result.message = "Error al generar el formato de impresión";
+                            goto Terminar;
+                        }
+                    }
+                }
+
+                if (oPrestamo.IDMovimiento > 0)
                 {
                     if (oPrestamo.FileCargo == null)
                     {
@@ -259,8 +290,8 @@ namespace SIUBET.Controllers
 
                     oPrestamo.ExtensionFile = Path.GetExtension(oPrestamo.FileCargo.FileName);
                 }
-               
-                rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, User.Identity.Name);
+
+                if (oPrestamo.Print == 0) rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -271,10 +302,7 @@ namespace SIUBET.Controllers
                     }
                     result.message = Global.vMsgSuccess;
                 }
-                else
-                {
-                    result.message = Global.vMsgFail;
-                }
+                else result.message = Global.vMsgFail;
 
             }
             catch (Exception)
@@ -443,7 +471,9 @@ namespace SIUBET.Controllers
                         result.message = "Debe anexar un documento de cargo.";
                         goto Terminar;
                     }
-
+                }
+                if (oTransf.FileCargo != null)
+                {
                     if (oTransf.FileCargo.ContentLength > Global.iMaxSizeFile)
                     {
                         result.message = Global.vMsgFileSizeFail + oTransf.FileCargo.FileName + ")";
@@ -487,144 +517,241 @@ namespace SIUBET.Controllers
             result.success = rpta;
             //result.message = message;
             return new JsonResult { Data = result };
-        }
-        public void PrePrintCargo(int id) {            
-            BEMovimiento oRpt = new BEMovimiento();
-            oRpt = new BLMovimientos().fnReporteCargoPrestamos(id);
+        }       
+        public bool GenerarDocumentoExcel(int id) {
+            bool rpta = false;
+            if (id > 0) {
+                FileInfo newFile = new FileInfo(Server.MapPath("~/Uploads/" + "DocGenerado.xlsx"));
+                if (newFile.Exists)
+                {
+                    newFile.Delete();  // ensures we create a new workbook
+                    newFile = new FileInfo(Server.MapPath("~/Uploads/" + "DocGenerado.xlsx"));
+                }
+                using (ExcelPackage pck = new ExcelPackage(newFile))
+                {
+                    BEMovimiento oRpt = new BEMovimiento();
+                    oRpt = new BLMovimientos().fnReporteCargoPrestamos(id);
 
-            ExcelPackage pck = new ExcelPackage();
-            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Cargo");
+                    //ExcelPackage pck = new ExcelPackage();
+                    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Cargo");
 
-            //Construyendo el reporte      
-            ws.Cells["E3:K3"].Merge = true;
-            ws.Cells["E4:K4"].Merge = true;
-            ws.Cells["E3"].Value = "AREA DE ADMINISTRACIÓN DOCUMENTARIA E INFORMÁTICA";
-            ws.Cells["E4"].Value = "FORMULARIO DE SERVICIO ARCHIVÍSTICO N°" + oRpt.Correlativo;
+                    //Construyendo el reporte      
+                    ws.Cells["E3:K3"].Merge = true;
+                    ws.Cells["E4:K4"].Merge = true;
+                    ws.Cells["E3"].Value = "AREA DE ADMINISTRACIÓN DOCUMENTARIA E INFORMÁTICA";
+                    ws.Cells["E4"].Value = "FORMULARIO DE SERVICIO ARCHIVÍSTICO N°" + oRpt.Correlativo;
 
-            ws.Cells["I7"].Value = "FECHA";
-            ws.Cells["J7"].Value = oRpt.FechaMov;
+                    ws.Cells["I7"].Value = "FECHA";
+                    ws.Cells["J7"].Value = oRpt.FechaMov;
 
-            ws.Cells["C8:C8"].Style.Font.Bold = true;
-            ws.Cells["C8"].Value = "DATOS DEL SOLICITANTE";
-            ws.Cells["C9"].Value = "NOMBRES Y APELLIDOS";
-            ws.Cells["C10"].Value = "UNIDAD ÓRGANICA";
-            ws.Cells["C11"].Value = "SEDE";
-            ws.Cells["C12"].Value = "CORREO";
+                    ws.Cells["C8:C8"].Style.Font.Bold = true;
+                    ws.Cells["C8"].Value = "DATOS DEL SOLICITANTE";
+                    ws.Cells["C9"].Value = "NOMBRES Y APELLIDOS";
+                    ws.Cells["C10"].Value = "UNIDAD ÓRGANICA";
+                    ws.Cells["C11"].Value = "SEDE";
+                    ws.Cells["C12"].Value = "CORREO";
 
-            ws.Cells["F9"].Value = oRpt.Ing_Evaluador;
-            ws.Cells["F10"].Value = "";
-            ws.Cells["F11"].Value = "OLAECHEA";
-            ws.Cells["F12"].Value = oRpt.Correo;
+                    ws.Cells["F9"].Value = oRpt.Ing_Evaluador;
+                    ws.Cells["F10"].Value = "";
+                    ws.Cells["F11"].Value = "OLAECHEA";
+                    ws.Cells["F12"].Value = oRpt.Correo;
 
-            ws.Cells["C9:K12"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                    ws.Cells["C9:K12"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            ws.Cells["C14"].Value = "TIPO DEL SERVICIO";
-            ws.Cells["F14"].Value = "";
+                    ws.Cells["C14"].Value = "TIPO DEL SERVICIO";
+                    ws.Cells["F14"].Value = "";
 
-            ws.Cells["C16"].Value = "ITEM";
-            ws.Cells["D16"].Value = "SNIP";
-            ws.Cells["E16"].Value = "DESCRIPCIÓN DEL PIP";
-            ws.Cells["F16"].Value = "HT";
-            ws.Cells["G16"].Value = "FECHA HT";
-            ws.Cells["H16"].Value = "DOCUMENTO DE INGRESO";
-            ws.Cells["I16"].Value = "UNIDAD DE CONSERVACIÓN";
-            ws.Cells["J16"].Value = "FOLIOS";
-            ws.Cells["K16"].Value = "CD";
+                    ws.Cells["C16"].Value = "ITEM";
+                    ws.Cells["D16"].Value = "SNIP";
+                    ws.Cells["E16"].Value = "DESCRIPCIÓN DEL PIP";
+                    ws.Cells["F16"].Value = "HT";
+                    ws.Cells["G16"].Value = "FECHA HT";
+                    ws.Cells["H16"].Value = "DOCUMENTO DE INGRESO";
+                    ws.Cells["I16"].Value = "UNIDAD DE CONSERVACIÓN";
+                    ws.Cells["J16"].Value = "FOLIOS";
+                    ws.Cells["K16"].Value = "CD";
 
-            ws.Cells["C16:K16"].Style.Font.Bold = true;
-            int item = 16;
+                    ws.Cells["C16:K16"].Style.Font.Bold = true;
+                    int item = 16;
 
-            var headerTable = ws.Cells["C16:K16"];
-            headerTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            headerTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            headerTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            headerTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    var headerTable = ws.Cells["C16:K16"];
+                    headerTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    headerTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    headerTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    headerTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
 
-            foreach (BEExpediente exp in oRpt.ListadoETs)
-            {
-                item++;
-                ws.Cells["C" + item.ToString()].Value = exp.Nro;
-                ws.Cells["D" + item.ToString()].Value = exp.Snip;
-                ws.Cells["E" + item.ToString()].Value = exp.NombreProyecto;
-                ws.Cells["F" + item.ToString()].Value = exp.NumeroHT;
-                ws.Cells["G" + item.ToString()].Value = exp.FechaOficio;
-                ws.Cells["H" + item.ToString()].Value = exp.NVersion;
-                ws.Cells["I" + item.ToString()].Value = exp.UnidadConservacion;
-                ws.Cells["J" + item.ToString()].Value = exp.Folios;
-                ws.Cells["K" + item.ToString()].Value = exp.CDs;
+                    foreach (BEExpediente exp in oRpt.ListadoETs)
+                    {
+                        item++;
+                        ws.Cells["C" + item.ToString()].Value = exp.Nro;
+                        ws.Cells["D" + item.ToString()].Value = exp.Snip;
+                        ws.Cells["E" + item.ToString()].Value = exp.NombreProyecto;
+                        ws.Cells["F" + item.ToString()].Value = exp.NumeroHT;
+                        ws.Cells["G" + item.ToString()].Value = exp.FechaOficio;
+                        ws.Cells["H" + item.ToString()].Value = exp.NVersion;
+                        ws.Cells["I" + item.ToString()].Value = exp.UnidadConservacion;
+                        ws.Cells["J" + item.ToString()].Value = exp.Folios;
+                        ws.Cells["K" + item.ToString()].Value = exp.CDs;
 
-                var bodyTable = ws.Cells["C" + item.ToString() + ":K" + item.ToString()];
-                bodyTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                bodyTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                bodyTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                bodyTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                        var bodyTable = ws.Cells["C" + item.ToString() + ":K" + item.ToString()];
+                        bodyTable.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        bodyTable.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        bodyTable.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        bodyTable.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    }
+
+                    ws.Cells["C16:K" + item.ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    ws.Cells["C16:K" + item.ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                    ws.Cells["E17:E" + item.ToString()].Style.WrapText = true;
+                    ws.Cells["H16:K" + item.ToString()].Style.WrapText = true;
+
+                    item++;
+                    ws.Cells["C" + item.ToString()].Value = "OBSERVACIONES";
+                    ws.Cells["E" + item.ToString() + ":K" + (item + 1).ToString()].Merge = true;
+                    ws.Cells["E" + item.ToString() + ":K" + (item + 1).ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+                    ws.Cells["E" + item.ToString()].Value = oRpt.Observaciones;
+
+                    item = item + 4;
+                    int itemFirmas = item;
+                    ws.Cells["H" + item.ToString() + ":J" + item.ToString()].Merge = true;
+                    ws.Cells["E" + item.ToString()].Value = "__________________________";
+                    ws.Cells["H" + item.ToString()].Value = "___________________________________________";
+
+                    item++;
+                    ws.Cells["H" + item.ToString() + ":J" + item.ToString()].Merge = true;
+                    ws.Cells["E" + item.ToString()].Value = "RESPONSABLE DE PRÉSTAMO";
+                    ws.Cells["H" + item.ToString()].Value = "CONFORMIDAD DE RECEPCIÓN DEL SOLICITANTE";
+
+                    item = item + 2;
+                    ws.Cells["F" + item.ToString() + ":G" + item.ToString()].Merge = true;
+                    ws.Cells["F" + item.ToString()].Value = "_____________________________";
+
+                    item++;
+                    ws.Cells["F" + item.ToString() + ":G" + item.ToString()].Merge = true;
+                    ws.Cells["F" + item.ToString()].Value = "CONFORMIDAD DE DEVOLUCIÓN";
+
+                    item++;
+
+                    ws.Cells["A1:K" + item.ToString()].Style.Font.Name = "Tahoma";
+                    ws.Cells["A1:K" + item.ToString()].Style.Font.Size = 10;
+                    ws.Cells["A3:K4"].Style.Font.Size = 14;
+                    ws.Cells["A17:K" + item.ToString()].Style.Font.Size = 9;
+                    ws.Cells["A3:K4"].Style.Font.Bold = true;
+                    ws.Cells["E3:K4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    ws.Cells["C" + itemFirmas.ToString() + ":K" + item.ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                    ws.Cells["B2:L" + item.ToString()].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+                    ws.Column(1).Width = 1;
+                    ws.Column(2).Width = 1;
+                    ws.Column(3).Width = 8;
+                    ws.Column(4).Width = 10;
+                    ws.Column(5).Width = 50;
+                    ws.Column(6).Width = 18;
+                    ws.Column(7).Width = 12;
+                    ws.Column(8).Width = 30;
+                    ws.Column(9).Width = 20;
+                    ws.Column(10).Width = 11;
+                    ws.Column(11).Width = 11;
+                    ws.Column(12).Width = 1;
+
+                    ws.PrinterSettings.FitToPage = true;
+                    ws.PrinterSettings.Orientation = eOrientation.Portrait;
+                    pck.Save();
+                    rpta = true;
+                }
+
             }
+            return rpta;
+        }
+        public ActionResult RCrear(string ets) {
+            BEMovimiento oRep = new BEMovimiento();
+            oRep.ET_selected_P = ets;
+            oRep.FechaMov = DateTime.Now.ToShortDateString();
+            oRep.FechaEmision = oRep.FechaMov;           
+            oRep.IDTipoMov = 6; //Reprografia 
+            oRep.PadreHome = 1;       
+            return PartialView(oRep);
+        }
+        [HttpPost]
+        public ActionResult RCrear(BEMovimiento oRep)
+        {
+            if (!Request.IsAjaxRequest()) return null;
 
-            ws.Cells["C16:K" + item.ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            ws.Cells["C16:K" + item.ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            ws.Cells["E17:E" + item.ToString()].Style.WrapText = true;
-            ws.Cells["H16:K" + item.ToString()].Style.WrapText = true;
+            ObjetoJson result = new ObjetoJson();
+            bool rpta = false;
+            try
+            {
+                if (oRep.Ing_Evaluador == null || oRep.Ing_Evaluador.Trim().Length <= 0)
+                {
+                    result.message = "Ingrese el Ingeniero/Otros";
+                    goto Terminar;
+                }
 
-            item++;
-            ws.Cells["C" + item.ToString()].Value = "OBSERVACIONES";
-            ws.Cells["E" + item.ToString() + ":K" + (item + 1).ToString()].Merge = true;
-            ws.Cells["E" + item.ToString() + ":K" + (item + 1).ToString()].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            ws.Cells["E" + item.ToString()].Value = oRpt.Observaciones;
+                if (oRep.Print == 1)
+                {
+                    rpta = new BLMovimientos().fnInsertarMovPrestamo(oRep, User.Identity.Name);
+                    if (rpta)
+                    {
+                        rpta = GenerarDocumentoExcel(oRep.IDMovimiento);
+                        if (rpta)
+                        {
+                            result.Movimiento = oRep;
+                            goto Terminar;
+                        }
+                        else
+                        {
+                            result.message = "Error al generar el formato de impresión";
+                            goto Terminar;
+                        }
+                    }
+                }
 
-            item = item + 4;
-            int itemFirmas = item;
-            ws.Cells["H" + item.ToString() + ":J" + item.ToString()].Merge = true;
-            ws.Cells["E" + item.ToString()].Value = "__________________________";
-            ws.Cells["H" + item.ToString()].Value = "___________________________________________";
+                if (oRep.IDMovimiento > 0)
+                {
+                    if (oRep.FileCargo == null)
+                    {
+                        result.message = "Debe anexar un documento de cargo.";
+                        goto Terminar;
+                    }
 
-            item++;
-            ws.Cells["H" + item.ToString() + ":J" + item.ToString()].Merge = true;
-            ws.Cells["E" + item.ToString()].Value = "RESPONSABLE DE PRÉSTAMO";
-            ws.Cells["H" + item.ToString()].Value = "CONFORMIDAD DE RECEPCIÓN DEL SOLICITANTE";
+                    if (oRep.FileCargo.ContentLength > Global.iMaxSizeFile)
+                    {
+                        result.message = Global.vMsgFileSizeFail + oRep.FileCargo.FileName + ")";
+                        goto Terminar;
+                    }
 
-            item = item + 2;
-            ws.Cells["F" + item.ToString() + ":G" + item.ToString()].Merge = true;
-            ws.Cells["F" + item.ToString()].Value = "_____________________________";
+                    var supportedTypes = new[] { Global.vPDF };
+                    var fileExtCargo = System.IO.Path.GetExtension(oRep.FileCargo.FileName).Substring(1);
+                    if (!supportedTypes.Contains(fileExtCargo))
+                    {
+                        result.message = Global.vMsgFileTypefail;
+                        goto Terminar;
+                    }
 
-            item++;
-            ws.Cells["F" + item.ToString() + ":G" + item.ToString()].Merge = true;
-            ws.Cells["F" + item.ToString()].Value = "CONFORMIDAD DE DEVOLUCIÓN";
+                    oRep.ExtensionFile = Path.GetExtension(oRep.FileCargo.FileName);
+                }
 
-            item++;
+                if(oRep.Print == 0) rpta = new BLMovimientos().fnInsertarMovPrestamo(oRep, User.Identity.Name);
 
-            ws.Cells["A1:K" + item.ToString()].Style.Font.Name = "Tahoma";
-            ws.Cells["A1:K" + item.ToString()].Style.Font.Size = 10;
-            ws.Cells["A3:K4"].Style.Font.Size = 14;
-            ws.Cells["A17:K" + item.ToString()].Style.Font.Size = 9;
-            ws.Cells["A3:K4"].Style.Font.Bold = true;
-            ws.Cells["E3:K4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            ws.Cells["C" + itemFirmas.ToString() + ":K" + item.ToString()].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                if (rpta)
+                {
+                    if (oRep.FileCargo != null)
+                    {
+                        string adjuntoFileCargo = oRep.Archivo + "-S" + Path.GetExtension(oRep.FileCargo.FileName);
+                        oRep.FileCargo.SaveAs(Server.MapPath("~/Uploads/" + adjuntoFileCargo));
+                    }
+                    result.message = Global.vMsgSuccess;
+                }
+                else result.message = Global.vMsgFail;                
 
-            ws.Cells["B2:L" + item.ToString()].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-
-            ws.Column(1).Width = 1;
-            ws.Column(2).Width = 1;
-            ws.Column(3).Width = 8;
-            ws.Column(4).Width = 10;
-            ws.Column(5).Width = 50;
-            ws.Column(6).Width = 18;
-            ws.Column(7).Width = 12;
-            ws.Column(8).Width = 30;
-            ws.Column(9).Width = 20;
-            ws.Column(10).Width = 11;
-            ws.Column(11).Width = 11;
-            ws.Column(12).Width = 1;
-
-            ws.PrinterSettings.FitToPage = true;
-            ws.PrinterSettings.Orientation = eOrientation.Portrait;
-
-            //fin
-
-            Response.Clear();
-            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            Response.AddHeader("content-disposition", "attachment;  filename=Sample1.xlsx");
-            Response.BinaryWrite(pck.GetAsByteArray());
-            Response.End();
+            }
+            catch (Exception e) {  result.message = Global.vMsgThrow+":"+e.Message; }
+            Terminar:
+            result.items = null;
+            result.success = rpta;
+            //result.message = message;
+            return new JsonResult { Data = result };
         }
     }
 }

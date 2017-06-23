@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace BusinessEntity
 {
-    public class BERespDev
+    public class BEListado
     {
-        public int IDResponsable { get; set; }
+        public int ID { get; set; }
+        public int Codigo { get; set; }
         public string Descripcion { get; set; }
     }
 }

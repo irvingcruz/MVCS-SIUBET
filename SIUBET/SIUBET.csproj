@@ -355,6 +355,7 @@
     <Content Include="Views\Movimiento\TCrear.cshtml" />
     <Content Include="Views\Movimiento\TIndex.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Movimiento\RCrear.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

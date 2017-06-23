@@ -21,6 +21,10 @@ namespace SIUBET
                 "movimiento/tcrear/{ets}",
                 new { controller = "Movimiento", action = "TCrear", ets = "" });
 
+            routes.MapRoute("Movimiento3",
+                "movimiento/rcrear/{ets}",
+                new { controller = "Movimiento", action = "RCrear", ets = "" });
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

@@ -27,7 +27,7 @@ namespace SIUBET.Controllers
         }
 
         [HttpPost]
-        public JsonResult ListadoExpedientes(int snip, string numeroHT, string estado, string etapa, int pageNumber, int pageSize)
+        public JsonResult ListadoExpedientes(int snip, string numeroHT,string docIngreso, string estado, string etapa, int pageNumber, int pageSize)
         {
 
             if (!Request.IsAjaxRequest()) return null;
@@ -35,7 +35,7 @@ namespace SIUBET.Controllers
 
             int totalRows = 0;
             int totalRowsFilter = 0;
-            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, estado, etapa, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
+            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, docIngreso, estado, etapa, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
             //Dim datosResult = New ReglaValidacionApp().ReglasVerificacionListarFiltradoPaginado(filtros, oUsuario.dni, pageIndex, take, TotalRows, TotalRowFilter)
 
 

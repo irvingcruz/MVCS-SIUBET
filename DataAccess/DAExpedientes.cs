@@ -25,8 +25,9 @@ namespace DataAccess
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Snip", _oExp.Snip);
                 cmd.Parameters.AddWithValue("@NumeroHT", _oExp.NumeroHT);
+                cmd.Parameters.AddWithValue("@DocIngreso", _oExp.NVersion);
                 cmd.Parameters.AddWithValue("@Estado", _oExp.Estado);
-                cmd.Parameters.AddWithValue("@Etapa", _oExp.Etapa);                
+                cmd.Parameters.AddWithValue("@Etapa", _oExp.Etapa);            
                 oCon.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                 {
@@ -44,6 +45,7 @@ namespace DataAccess
                         oExp.Etapa = dr["Etapa"].ToString();
                         oExp.IDTipoMov = Convert.ToInt32(dr["IDTipoMov"]);
                         oExp.UbiTopografica = dr["UbiTopografica"].ToString();
+                        oExp.Priorizacion = dr["Priorizacion"].ToString();
                         oExp.Activo = Convert.ToBoolean(dr["Activo"]);
                         listado.Add(oExp);
                     }

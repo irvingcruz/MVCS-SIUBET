@@ -25,13 +25,13 @@ namespace BusinessLogic
                 throw;
             }
         }
-        public List<BERespDev> fnListarResponsables()
+        public List<BEListado> fnListarCbo(string Tipo)
         {
             try
             {
                 oCon = BLConexion.SIUBET();
                 DAMovimientos obj = new DAMovimientos(oCon);
-                List<BERespDev> resultado = obj.fnListarResponsables();
+                List<BEListado> resultado = obj.fnListarCbo(Tipo);
                 return resultado;
             }
             catch (Exception)

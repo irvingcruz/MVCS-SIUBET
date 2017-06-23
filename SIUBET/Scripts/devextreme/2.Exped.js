@@ -3,7 +3,12 @@
     var txtNumeroHT = $("#txtNumeroHT").dxTextBox({
 		placeholder: "Escribir código...",
 		showClearButton: true,
-	});
+    });
+
+    var txtDocIngreso = $("#txtDocIngreso").dxTextBox({
+        placeholder: "Escribir documento...",
+        showClearButton: true,
+    });
 
     var estados = [
         { "ID": 0, "Name": "-- TODOS --" },
@@ -41,7 +46,7 @@
 	function fnLimpiarFiltros() {
 		txtSnip.dxTextBox("instance").option("value", "");
 		txtNumeroHT.dxTextBox("instance").option("value", "");
-		//txtProyecto.dxTextBox("instance").option("value", "");
+		txtDocIngreso.dxTextBox("instance").option("value", "");
 	}
 
 	$("#btnLimpiar").on("click", function () {
@@ -84,7 +89,7 @@
 
 	    popupDD = $("#popup-DD").dxPopup({
 	        showTitle: true,
-	        title: IDTipoMov == 2 ? 'Crear Devolución' : 'Crear Derivación',
+	        title: IDTipoMov == 2 ? 'Devolución UE' : 'Crear Derivación',
 	        width: 880,
 	        height: "auto",
 	        contentTemplate: function () {
@@ -96,21 +101,27 @@
 	    popupDD.dxPopup("instance").show();	    
 	}
 
-	function fnOpenPopupPrestamo() {
+	function fnOpenPopupPrestamo(Reprografia) {
 	    //console.log(_selectedItems);
 	    if (_selectedItems == "") {
 	        showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
 	        return;
 	    }
+	    var _title = "Crear Préstamo";
+	    var _accion = "PreCrear/";
+	    if (Reprografia == 1) {
+	        _title = "Crear Reprografia";
+	        _accion = "RCrear/";
+	    }
 
 	    popupPrestamo = $("#popup-prestamo").dxPopup({
 	        showTitle: true,
-	        title: 'Crear Préstamo',
+	        title: _title,
 	        width: 880,
 	        height: "auto",
 	        contentTemplate: function () {
 	            var $pageContent = $("<span />");
-	            return $pageContent.load($urlReal + 'Movimiento/PreCrear/'+_selectedItems);
+	            return $pageContent.load($urlReal + 'Movimiento/'+_accion+_selectedItems);
 	        },
 	        showCloseButton: true,
 	    });
@@ -158,6 +169,7 @@
 			{ dataField: "NombreProyecto", caption: "Proyecto", width: 300, },
             { dataField: "NumeroHT", caption: "Documento HT", width: 150, },
 			{ dataField: "NVersion", caption: "Documento Ingreso", width: 150, },
+            { dataField: "Priorizacion", caption: "Priorización", alignment: "center", width: 100, },
             { dataField: "Etapa", caption: "Etapa", alignment: "center", width: 100, },
             { dataField: "Estado", caption: "Estado Actual", alignment: "center", width: 250, },
             { dataField: "UbiTopografica", caption: "U.Topográfica (E:C:B) | (PQ:PO)", width: 200, },
@@ -181,7 +193,7 @@
 							        locateInMenu: 'auto',
 							        //disabled: item.Vincular == false,
 							        options: {
-							            icon: "glyphicon glyphicon-edit",
+							            icon: "glyphicon glyphicon-pencil",
 							            text: "Actualizar Etapa",
 							            onClick: function () {
 							                fnOpenPopupEtapa();
@@ -199,7 +211,18 @@
 							                fnOpenPopupPrestamo();
 							            }
 							        }
-
+							    },
+							    {
+							        location: 'after',
+							        widget: 'dxButton',
+							        locateInMenu: 'auto',
+							        options: {
+							            icon: "glyphicon glyphicon-log-out",
+							            text: "Servicios",
+							            onClick: function () {
+							                fnOpenPopupPrestamo(1);
+							            }
+							        }
 							    },
 							    {
 							        location: 'after',
@@ -207,7 +230,7 @@
 							        locateInMenu: 'auto',
 							        options: {
 							            icon: "glyphicon glyphicon-repeat",
-							            text: "Devolución",
+							            text: "Devolución UE",
 							            onClick: function () {
 							                fnOpenPopupDD(2);
 							            }
@@ -347,6 +370,7 @@
 				args.snip = txtSnip.dxTextBox("instance").option("value");
 				if (args.snip == "") args.snip = 0;
 				args.numeroHT = txtNumeroHT.dxTextBox("instance").option("value");
+				args.docIngreso = txtDocIngreso.dxTextBox("instance").option("value");
 				args.estado = cboEstado.dxSelectBox("instance").option("value");
 				args.etapa = cboEtapa.dxSelectBox("instance").option("value");
 				args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientes.dxDataGrid("instance")._options.paging.pageIndex + 1;

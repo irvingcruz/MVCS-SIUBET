@@ -46,5 +46,9 @@ namespace BusinessEntity
         public string Correlativo { get; set; }
         public List<BEExpediente> ListadoETs { get; set; }
         public string Correo { get; set; }
+        public string[] Modalidad { get; set; }
+        public int PadreHome { get; set; }
+        public int Print { get; set; }
+        public string TipoDevolucion { get; set; }
     }
 }

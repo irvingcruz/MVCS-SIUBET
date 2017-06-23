@@ -13,13 +13,14 @@ namespace BusinessLogic
     {
         private SqlConnection oCon;
 
-        public List<BEExpediente> fnListarExpedientes(int snip, string numeroHT, string estado, string etapa, int pageNumber,int pageSize, ref int totalRows, ref int totalRowsFilter) {
+        public List<BEExpediente> fnListarExpedientes(int snip, string numeroHT, string docIngreso, string estado, string etapa, int pageNumber,int pageSize, ref int totalRows, ref int totalRowsFilter) {
             try {
                 oCon = BLConexion.SIUBET();
                 DAExpedientes obj = new DAExpedientes(oCon);
                 BEExpediente _oExp = new BEExpediente();
                 _oExp.Snip = snip;
                 _oExp.NumeroHT = numeroHT;
+                _oExp.NVersion = docIngreso;
                 _oExp.Estado = estado;
                 _oExp.Etapa = etapa;
                 List<BEExpediente> resultado = obj.fnListarExpedientes(_oExp);
