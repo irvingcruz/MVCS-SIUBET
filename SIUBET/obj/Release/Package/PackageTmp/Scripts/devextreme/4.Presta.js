@@ -9,7 +9,7 @@
     });
 
     $("#btnBuscar").on("click", function () {
-        fnListarPrestamos(0);
+        fnListarMovimientos(0, 4, gridPrestamos.dxDataGrid("instance"));
     });
 
     gridPrestamos = $("#gridPrestamos").dxDataGrid({
@@ -137,11 +137,11 @@
             allowedPageSizes: [10, 20, 50, 100, 200],
             infoText: $infoTextPaginado,
         },
-        "export": {
-            enabled: true,
-            fileName: "Listado Movimientos",
-            allowExportSelectedData: true
-        },
+        //"export": {
+        //    enabled: true,
+        //    fileName: "Listado Movimientos",
+        //    allowExportSelectedData: true
+        //},
         loadPanel: {
             text: $textLoad
         },

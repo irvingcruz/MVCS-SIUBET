@@ -14,30 +14,25 @@ using System.Web.Security;
 
 namespace SIUBET.Controllers
 {
-    [Authorize]    
+    [Authorize]
     public class ExpedientesController : Controller
     {
 
         // GET: Expedientes       
         public ActionResult Index()
         {
-            //if (oUsuario == null) return RedirectToAction("Logout","Account");
-            //else
             return View();
         }
 
         [HttpPost]
-        public JsonResult ListadoExpedientes(int snip, string numeroHT,string docIngreso, string estado, string etapa, int pageNumber, int pageSize)
+        public JsonResult ListadoExpedientes(int snip, string numeroHT, string docIngreso, string estado, string etapa, int pageNumber, int pageSize)
         {
-
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
 
             int totalRows = 0;
             int totalRowsFilter = 0;
             List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, docIngreso, estado, etapa, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
-            //Dim datosResult = New ReglaValidacionApp().ReglasVerificacionListarFiltradoPaginado(filtros, oUsuario.dni, pageIndex, take, TotalRows, TotalRowFilter)
-
 
             result.items = datosResult;
             result.totalRows = totalRows;
@@ -45,14 +40,12 @@ namespace SIUBET.Controllers
             result.success = true;
             result.message = totalRowsFilter + " registros encontrados";
 
-
             return new JsonResult { Data = result };
         }
 
         [HttpPost]
         public JsonResult ListadoExpedientesSelected(string IdsExpedientes, int pageNumber, int pageSize)
         {
-
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
 
@@ -64,14 +57,12 @@ namespace SIUBET.Controllers
             result.success = true;
             result.message = result.totalRowsFilter + " registros seleccionados";
 
-
             return new JsonResult { Data = result };
         }
 
         [HttpPost]
         public JsonResult ListadoExpedientesHistorial(int IDExpedienteVersion, int pageNumber, int pageSize)
         {
-
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
 
@@ -83,14 +74,12 @@ namespace SIUBET.Controllers
             result.success = true;
             result.message = result.totalRowsFilter + " registros seleccionados";
 
-
             return new JsonResult { Data = result };
         }
 
         [HttpPost]
         public JsonResult ListadoPersonas(int Tipo)
         {
-
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
 
@@ -104,14 +93,12 @@ namespace SIUBET.Controllers
             result.success = true;
             result.message = totalRowsFilter + " registros encontrados";
 
-
             return new JsonResult { Data = result };
         }
 
         [HttpPost]
         public JsonResult ListadoExpedientesEnRetorno(int IDMovimiento, int pageNumber, int pageSize)
         {
-
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
 
@@ -123,32 +110,36 @@ namespace SIUBET.Controllers
             result.success = true;
             result.message = result.totalRowsFilter + " registros para retorno";
 
-
             return new JsonResult { Data = result };
         }
 
         [Authorize(Roles = "1")]
-        public ActionResult Crear() {
+        public ActionResult Crear()
+        {
             BEExpediente oEpx = new BEExpediente();
             ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
             return View(oEpx);
         }
         [HttpPost]
-        public ActionResult Crear(BEExpediente oExp) {
-            if (!ModelState.IsValid) {
+        public ActionResult Crear(BEExpediente oExp)
+        {
+            if (!ModelState.IsValid)
+            {
                 goto Terminar;
             }
 
             ViewBag.Alerta = "danger";
-            
+
             string[] ECB = oExp.UbicacionECB.Split(Convert.ToChar(":"));
 
-            if (ECB.Length != 3) {
+            if (ECB.Length != 3)
+            {
                 ViewBag.Mensaje = "Debe ingresar una ubicación (E:C:B) válida.";
                 goto Terminar;
             }
 
-            if (oExp.UbicacionPP != null && oExp.UbicacionPP.Trim().Length > 0) {
+            if (oExp.UbicacionPP != null && oExp.UbicacionPP.Trim().Length > 0)
+            {
                 string[] PP = oExp.UbicacionPP.Split(Convert.ToChar(":"));
                 if (PP.Length != 2)
                 {
@@ -176,18 +167,20 @@ namespace SIUBET.Controllers
             BEExpediente oEpx = new BEExpediente();
             oEpx = new BLExpedientes().fnObtenerExpediente(id);
             ViewData["Sedes"] = new SelectList(new BLExpedientes().ListarSedes(), "IDSede", "Nombres");
-            return View("Crear",oEpx);
+            return View("Crear", oEpx);
         }
 
-        public ActionResult Etapa() {
+        public ActionResult Etapa()
+        {
             return PartialView();
         }
         [HttpPost]
-        public ActionResult Etapa(BEExpediente oExp) {
+        public ActionResult Etapa(BEExpediente oExp)
+        {
             if (!Request.IsAjaxRequest()) return null;
 
             ObjetoJson result = new ObjetoJson();
-            bool rpta = false;           
+            bool rpta = false;
             try
             {
                 if (oExp.Documento == null || oExp.Documento.Length == 0)
@@ -199,7 +192,7 @@ namespace SIUBET.Controllers
                 rpta = new BLExpedientes().fnActualizarEtapaET(oExp.Etapa, oExp.Documento, User.Identity.Name);
 
                 if (rpta) result.message = Global.vMsgSuccess;
-                else  result.message = Global.vMsgFail;
+                else result.message = Global.vMsgFail;
             }
             catch (Exception)
             {
@@ -212,5 +205,20 @@ namespace SIUBET.Controllers
             return new JsonResult { Data = result };
         }
 
+        [HttpPost]
+        public JsonResult ListadoTrazaSITRAD(string vNumeroHT)
+        {
+            if (!Request.IsAjaxRequest()) return null;
+            ObjetoJson result = new ObjetoJson();
+
+            List<BETrazaSITRAD> datosResult = new BLExpedientes().fnTrazabilidadSITRAD(vNumeroHT);    
+                    
+            result.items4 = datosResult;
+            result.totalRows = datosResult.Count();
+            result.totalRowsFilter = result.totalRows;            
+            result.message = result.totalRowsFilter + " registros seleccionados";
+            result.success = true;
+            return new JsonResult { Data = result };
+        }
     }
 }

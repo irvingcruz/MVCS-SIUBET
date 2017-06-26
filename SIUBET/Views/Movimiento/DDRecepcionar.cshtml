@@ -1,5 +1,5 @@
 ﻿<script>
-    $('#dp2').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });    
+    $('#dp3').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
 </script>
 @model BusinessEntity.BEMovimiento
 
@@ -8,11 +8,11 @@
     @Html.AntiForgeryToken()
 
     <div class="row">
+        @Html.HiddenFor(model => Model.IDMovimiento)
         <div class="col-xs-6">
-            <input type="hidden" name="IDMovimiento" id="IDMovimiento" value="@Model.IDMovimiento" />
             <div class="form-group">
                 <span class="control-label">Fecha</span>
-                <div class='input-group date' id='dp2'>
+                <div class='input-group date' id='dp3'>
                     @Html.EditorFor(model => model.FechaFinal, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
@@ -42,15 +42,11 @@
         var _Data = new FormData(document.getElementById("frmDD"));
         $.ajax({
             url: $urlReal + "/Movimiento/DDRecepcionar",
-            //data: $("#frmDev").serialize(),
             data: _Data,
             type: 'POST',
             processData: false,  // tell jQuery not to process the data
             contentType: false,   // tell jQuery not to set contentType
-            //dataType: "json",
-            //contentType: "application/json; charset=utf-8",
             success: function (result) {
-                //console.log(result);
                 if (result.success == true) {
                     showNotification(result.message, notificationTypes.success, 2000);
                     RetornaRecepciona.dxPopup("instance").hide();

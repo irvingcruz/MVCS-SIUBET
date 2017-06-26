@@ -1,6 +1,6 @@
 ﻿<script>
-    $('#dp0').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
     $('#dp1').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
+    $('#dp2').datetimepicker({ locale: 'es', format: 'DD-MM-YYYY' });
 </script>
 @model BusinessEntity.BEMovimiento
 
@@ -11,11 +11,11 @@
     <div class="row">
         @Html.HiddenFor(model => model.IDMovimiento)
         @Html.HiddenFor(model => model.IDTipoMov)
-        @Html.HiddenFor(model => model.ET_selected_D)        
+        @Html.HiddenFor(model => model.ET_selected)        
         <div class="col-xs-12 col-md-3">
             <div class="form-group">
                 <span class="control-label">Fecha Emisión</span>
-                <div class='input-group date' id='dp0'>
+                <div class='input-group date' id='dp1'>
                     @Html.EditorFor(model => model.FechaEmision, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
@@ -41,7 +41,7 @@
         <div class="col-xs-12 col-md-3">
             <div class="form-group">
                 <span class="control-label">Fecha Salida</span>
-                <div class='input-group date' id='dp1'>
+                <div class='input-group date' id='dp2'>
                     @Html.EditorFor(model => model.FechaMov, new { htmlAttributes = new { @class = "form-control", @placeholder = "dd-mm-yyyyy" } })
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
@@ -70,9 +70,7 @@
                 else
                 {<label>CAC</label>}
                 <div id="cboDD"></div>
-                @*@Html.EditorFor(model => model.EntidadDestino, new { htmlAttributes = new { @class = "form-control", @style = "display:none;", @placeholder = "Ingresar otra UE" } })*@
-                @*<input type="hidden" name="UndEjec_CAC" id="UndEjec_CAC" value="" />*@
-                @Html.HiddenFor(model => model.UndEjec_CAC)
+                @Html.HiddenFor(model => model.EntidadDestino)
             </div>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -105,7 +103,7 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
-                <div id="gridExpedientesSelectedDEV"></div>                            
+                <div id="gridExpedientesSelected"></div>                            
             </div>
         </div>
     </div>
@@ -121,20 +119,17 @@
 
 <script>
     var IDTipoMov = @Model.IDTipoMov;
+    $("#ET_selected").val($_selectedItems);
 
     $("#btnGrabarDev").on("click", function () {
         var _Data = new FormData(document.getElementById("frmDD"));
         $.ajax({
             url: $urlReal + "Movimiento/DDCrear",
-            //data: $("#frmDev").serialize(),
             data: _Data,
             type: 'POST',
             processData: false,  // tell jQuery not to process the data
             contentType: false,   // tell jQuery not to set contentType
-            //dataType: "json",
-            //contentType: "application/json; charset=utf-8",
             success: function (result) {
-                //console.log(result);
                 if (result.success == true) {
                     showNotification(result.message, notificationTypes.success, 2000);
                     popupDD.dxPopup("instance").hide();
@@ -149,10 +144,10 @@
             timeout: 500000
         });
     });
-    var id_exps_selected = $("#et_selected").val();
-    $("#ET_selected_D").val(id_exps_selected);
+    //var id_exps_selected = $("#et_selected").val();
+    //$("#ET_selected_D").val(id_exps_selected);
 
-    var gridExpedientesSelected = $("#gridExpedientesSelectedDEV").dxDataGrid({
+    var gridExpedientesSelected = $("#gridExpedientesSelected").dxDataGrid({
         columns: [
 			{ dataField: "Nro", caption: "#" },
 			//{ dataField: "IDVersion", caption: "ID", },
@@ -205,7 +200,7 @@
         load: function (loadOptions) {
             var deferred = $.Deferred(),
 				args = {};
-            args.IdsExpedientes = id_exps_selected;
+            args.IdsExpedientes = $_selectedItems;//id_exps_selected;
             args.pageNumber = pageIndex == 1 ? pageIndex : gridExpedientesSelected.dxDataGrid("instance")._options.paging.pageIndex + 1;
             args.pageSize = loadOptions.take || 10;
 
@@ -259,18 +254,15 @@
     });
 
     var cboDD = $("#cboDD").dxSelectBox({
-        //dataSource: {
-        //    store: listado
-        //},
         items: listado,
         placeholder: "Seleccionar...",
         displayExpr: "Nombres",
         valueExpr: "Nombres",
         searchEnabled: true,
-        value: listado.Nombres = $("#UndEjec_CAC").val(),
+        value: listado.Nombres = $("#EntidadDestino").val(),
         onValueChanged: function (e) {
             var ide = e.value;
-            $("#UndEjec_CAC").val(ide);
+            $("#EntidadDestino").val(ide);
         }
     });
 

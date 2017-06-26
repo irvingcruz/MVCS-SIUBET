@@ -51,7 +51,7 @@
                     dato.appendTo(container);
                 }
             },
-            { dataField: "UndEjec_CAC", caption: "Unidad Ejecutora / CAC", width: 200, },
+            { dataField: "EntidadDestino", caption: "Unidad Ejecutora / CAC", width: 220, },
             //{ dataField: "FechaRecepcion", caption: "Fec. Recepción", alignment: "center", width: 100, },
             {
                 caption: "Fec. Recepción",

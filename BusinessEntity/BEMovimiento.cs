@@ -18,14 +18,16 @@ namespace BusinessEntity
         public string TipoMov { get; set; }
         public int IDResponsable { get; set; }
         public string Responsable { get; set; }
-        public string NumeroCargo { get; set; }        
-        public string Ing_Evaluador { get; set; }
-        public string UndEjec_CAC { get; set; }
+        public string NumeroCargo { get; set; }
+        public string EntidadDestino { get; set; }
+        //public string Ing_Evaluador { get; set; }
+        //public string UndEjec_CAC { get; set; }
         public string Observaciones { get; set; }
         public string FechaFinal { get; set; }
-        public string ET_selected_D { get; set; }
-        public string ET_selected_P { get; set; }
-        public string ET_selected_T { get; set; }
+        public string ET_selected { get; set; }
+        //public string ET_selected_D { get; set; }
+        //public string ET_selected_P { get; set; }
+        //public string ET_selected_T { get; set; }
         public string Numero { get; set; }
         public string Folios { get; set; }
         public string CDs { get; set; }
@@ -47,6 +49,7 @@ namespace BusinessEntity
         public List<BEExpediente> ListadoETs { get; set; }
         public string Correo { get; set; }
         public string[] Modalidad { get; set; }
+        public string ModalidadTexto { get; set; }
         public int PadreHome { get; set; }
         public int Print { get; set; }
         public string TipoDevolucion { get; set; }

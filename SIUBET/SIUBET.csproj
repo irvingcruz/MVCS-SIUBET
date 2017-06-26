@@ -210,6 +210,7 @@
     <Content Include="Scripts\devextreme\3.Devol.js" />
     <Content Include="Scripts\devextreme\4.Presta.js" />
     <Content Include="Scripts\devextreme\5.Transf.js" />
+    <Content Include="Scripts\devextreme\6.Servi.js" />
     <Content Include="Scripts\devextreme\css\icons\dxicons.eot" />
     <Content Include="Scripts\devextreme\css\icons\dxicons.ttf" />
     <Content Include="Scripts\devextreme\css\icons\dxicons.woff" />
@@ -356,6 +357,7 @@
     <Content Include="Views\Movimiento\TIndex.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Movimiento\RCrear.cshtml" />
+    <Content Include="Views\Movimiento\RIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -53,7 +53,6 @@ namespace BusinessLogic
                 throw;
             }
         }
-
         public List<BEMovimiento> fnListarExpedientesHistorial(int IDExpedienteVersion, int pageNumber, int pageSize)
         {
             try
@@ -71,7 +70,6 @@ namespace BusinessLogic
                 throw;
             }
         }
-
         public List<BEPersona> fnListarPersona(int Tipo)
         {
             try
@@ -86,7 +84,6 @@ namespace BusinessLogic
                 throw;
             }
         }
-
         public List<BEExpediente> fnListarExpedientesEnRetorno(int IDMovimiento, int pageNumber, int pageSize)
         {
             try
@@ -123,7 +120,6 @@ namespace BusinessLogic
             listado.Add(new BEPersona { IDSede = 2, Nombres = "Callao" });
             return listado;
         }
-
         public bool fnActualizarEtapaET(string vEtapa, string IdsExpedientes, string vUsuario)
         {
             try
@@ -137,7 +133,6 @@ namespace BusinessLogic
                 throw;
             }
         }
-
         public BEExpediente fnObtenerExpediente(int IDVersion)
         {
             try
@@ -145,6 +140,32 @@ namespace BusinessLogic
                 oCon = BLConexion.SIUBET();
                 DAExpedientes obj = new DAExpedientes(oCon);
                 BEExpediente resultado = obj.fnObtenerExpediente(IDVersion);
+                return resultado;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public List<BETrazaSITRAD> fnTrazabilidadSITRAD(string vNumeroHT)
+        {
+            try
+            {
+                oCon = BLConexion.SITRAD();
+                DAExpedientes obj = new DAExpedientes(oCon);
+                //BETrazaSITRAD oTraza = new BETrazaSITRAD();
+                //_oExp.Snip = snip;
+                //_oExp.NumeroHT = numeroHT;
+                //_oExp.NVersion = docIngreso;
+                //_oExp.Estado = estado;
+                //_oExp.Etapa = etapa;
+                List<BETrazaSITRAD> resultado = obj.fnTrazabilidadSITRAD(vNumeroHT);
+                //totalRows = resultado.Count();
+                //totalRowsFilter = resultado.Count();
+                //resultado = resultado.OrderBy(e => e.Nro)
+                //    .Skip((pageNumber - 1) * pageSize)
+                //    .Take(pageSize).ToList();
                 return resultado;
             }
             catch (Exception)

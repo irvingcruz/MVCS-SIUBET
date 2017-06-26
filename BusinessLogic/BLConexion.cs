@@ -15,5 +15,10 @@ namespace BusinessLogic
             SqlConnection Cno = new SqlConnection(ConfigurationManager.AppSettings["SIUBET"]);
             return Cno;
         }
+        public static SqlConnection SITRAD()
+        {
+            SqlConnection Cno = new SqlConnection(ConfigurationManager.AppSettings["SITRAD"]);
+            return Cno;
+        }
     }
 }

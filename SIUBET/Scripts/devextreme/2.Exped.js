@@ -1,4 +1,6 @@
-﻿$(document).ready(function () {
+﻿$_selectedItems = "";
+
+$(document).ready(function () {
 
     var txtNumeroHT = $("#txtNumeroHT").dxTextBox({
 		placeholder: "Escribir código...",
@@ -57,7 +59,9 @@
 		fnListarExpedientes(0);
 	});
 
-	_selectedItems = "";
+	$("#btnSITRAD").on("click", function () {
+	    fnTrazaSitrad(0);
+	});
 
     function fnOpenPopupEtapa(){
         if (_selectedItems == "") {
@@ -80,9 +84,9 @@
     }
 
 	function fnOpenPopupDD(IDTipoMov) {
-	    //console.log(IDTipoMov);
-        //[2]Devolución, [5]Derivación
-	    if (_selectedItems == "") {
+	    //[2]Devolución, [5]Derivación
+	    fnLimpiarDivs();
+	    if ($_selectedItems == "") {
 	        showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
 	        return;
 	    }
@@ -102,15 +106,15 @@
 	}
 
 	function fnOpenPopupPrestamo(Reprografia) {
-	    //console.log(_selectedItems);
-	    if (_selectedItems == "") {
+	    fnLimpiarDivs();
+	    if ($_selectedItems == "") {
 	        showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
 	        return;
 	    }
 	    var _title = "Crear Préstamo";
 	    var _accion = "PreCrear/";
 	    if (Reprografia == 1) {
-	        _title = "Crear Reprografia";
+	        _title = "Servicio Archivístico";
 	        _accion = "RCrear/";
 	    }
 
@@ -121,7 +125,7 @@
 	        height: "auto",
 	        contentTemplate: function () {
 	            var $pageContent = $("<span />");
-	            return $pageContent.load($urlReal + 'Movimiento/'+_accion+_selectedItems);
+	            return $pageContent.load($urlReal + 'Movimiento/' + _accion + $_selectedItems);
 	        },
 	        showCloseButton: true,
 	    });
@@ -129,8 +133,8 @@
 	}
 
 	function fnOpenPopupTransferencia() {
-	    //console.log(_selectedItems);
-	    if (_selectedItems == "") {
+	    fnLimpiarDivs();
+	    if ($_selectedItems == "") {
 	        showNotification("Debe elegir uno o mas registros.", notificationTypes.warning, 2000);
 	        return;
 	    }
@@ -142,7 +146,7 @@
 	        height: "auto",
 	        contentTemplate: function () {
 	            var $pageContent = $("<span />");
-	            return $pageContent.load($urlReal + 'Movimiento/TCrear/' + _selectedItems);
+	            return $pageContent.load($urlReal + 'Movimiento/TCrear/' + $_selectedItems);
 	        },
 	        showCloseButton: true,
 	    });
@@ -260,19 +264,32 @@
 							            }
 							        }
 							    },
-							    {
-							        location: 'after',
-							        widget: 'dxButton',
-							        locateInMenu: 'auto',
-							        //disabled: item.Vincular == false,
-							        options: {
-							            icon: "glyphicon glyphicon-th-list",
-							            text: "Ver historial",
-							            onClick: function () {
-							                fnOpenPopupHistorial(item.IDVersion);
-							            }
-							        }
-							    },                            
+							    //{
+							    //    location: 'after',
+							    //    widget: 'dxButton',
+							    //    locateInMenu: 'auto',
+							    //    //disabled: item.Vincular == false,
+							    //    options: {
+							    //        icon: "glyphicon glyphicon-th-list",
+							    //        text: "Ver historial",
+							    //        onClick: function () {
+							    //            fnOpenPopupHistorial(item.IDVersion);
+							    //        }
+							    //    }
+							    //}, 
+							    //{
+							    //    location: 'after',
+							    //    widget: 'dxButton',
+							    //    locateInMenu: 'auto',
+							    //    //disabled: item.Vincular == false,
+							    //    options: {
+							    //        icon: "glyphicon glyphicon-tasks",
+							    //        text: "Traza SITRAD",
+							    //        onClick: function () {
+							    //            fnTrazaSitrad(item.NumeroHT);
+							    //        }
+							    //    }
+							    //},
 					        ]
 					    });
 			        //}
@@ -312,15 +329,15 @@
 		onSelectionChanged: function (selectedItems) {
 		    var data = selectedItems.selectedRowsData;
 		    if (data.length > 0) {
-		        _selectedItems = $.map(data, function (value) {
+		        $_selectedItems = $.map(data, function (value) {
 		            return value.IDVersion;
 		        }).join("|");                
 		    }
 		    else {
-		        _selectedItems = "";
+		        $_selectedItems = "";
 		    }
-		    console.log("vars:" + _selectedItems);
-		    $("#et_selected").val(_selectedItems);
+		    console.log("vars:" + $_selectedItems);
+		    $("#ets_selected").val($_selectedItems);
 		},
 		remoteOperations: true,
 		scrolling: {
@@ -515,4 +532,111 @@
 
 	fnListarExpedientes(0);
 
+
+	function fnTrazaSitrad() {
+
+	    var NumeroHT = txtNumeroHT.dxTextBox("instance").option("value");
+	    var _params = NumeroHT.split("-");
+
+	    if (_params.length != 2) {
+	        showNotification("Datos Incorrectos, favor de seguir el formato [expdiente-año]", notificationTypes.warning, 2000);
+	        return;
+	    }
+
+	    popupSITRAD = $("#popup-SITRAD").dxPopup({
+	        showTitle: true,
+	        title: "Trazabilidad de la HT en SITRAD",
+	        width: 900,
+	        //height: 400,
+	        showCloseButton: true,
+	        onShown: function () {
+	            $("#NoteScroll").dxScrollView();
+	        }
+	    });
+
+	    popupSITRAD.dxPopup("instance").show();
+
+	    gridSITRAD = $("#gridSITRAD").dxDataGrid({
+	        columns: [
+                { dataField: "Nro", alignment: "center", caption: "#" },
+                { dataField: "Documento", width: 100, },
+                { dataField: "EnviaArea", caption: "Envia-Area", width: 150, },
+                { dataField: "EnviaFecha", caption: "Envia-Fecha", alignment: "center", width: 100, },
+                { dataField: "RecibeArea", caption: "Recibe-Area", width: 150, },
+                { dataField: "RecibeFecha", caption: "Recibe-Fecha", alignment: "center", width: 100, },
+                { dataField: "Estado", caption: "Estado", width: 100, },
+                { dataField: "Dias", alignment: "center", width: 40, },
+                { dataField: "Observaciones", width: 200, },
+	        ],
+	        //remoteOperations: false,
+	        scrolling: {
+	            mode: "standard",
+	        },
+	        sorting: {
+	            mode: "none"
+	        },
+	        paging: {
+	            enabled: false,
+	            pageIndex: 0,
+	            pageSize: 10
+	        },
+	        //pager: {
+	        //    showPageSizeSelector: true,
+	        //    showNavigationButtons: true,
+	        //    showInfo: true,
+	        //    allowedPageSizes: [10, 20, 50, 100, 200],
+	        //    infoText: $infoTextPaginado,
+	        //},
+	        loadPanel: { text: $textLoad },
+	        noDataText: $noDataText,
+	        selection: { mode: "single" },
+	        wordWrapEnabled: true,
+	        showColumnLines: false,
+	        showRowLines: false,
+	        rowAlternationEnabled: true,
+	        hoverStateEnabled: true,
+	        columnAutoWidth: true,
+	        allowColumnResizing: true,
+	    });
+
+	    var listadoSITRAD = new DevExpress.data.CustomStore({
+	        load: function (loadOptions) {
+	            var deferred = $.Deferred(),
+                    args = {};
+
+	            args.vNumeroHT = NumeroHT;
+                $.ajax({
+                    url: $urlReal + "Expedientes/ListadoTrazaSITRAD",
+                    data: JSON.stringify(args),
+                    type: 'POST',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        $stateSearch = false;
+                        $(".totalRowsFilter").text(result.totalRowsFilter)
+                        $(".totalRows").text(result.totalRows)
+                        showNotification(result.message, notificationTypes.success, 2000);
+                        deferred.resolve(result.items4, { totalCount: result.totalRowsFilter });
+                    },
+                    error: function () {
+                        deferred.reject($infoTextError);
+                    },
+                    timeout: 500000
+                });
+	            return deferred.promise();
+	        },
+
+	    });
+
+	    gridSITRAD.dxDataGrid("instance").option({
+	        dataSource: {
+	            store: listadoSITRAD
+	        },
+	    });
+
+	}
+
+
 });
+
+

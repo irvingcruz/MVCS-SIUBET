@@ -122,8 +122,7 @@ namespace DataAccess
                         oExp.Responsable = dr["Responsable"].ToString();
                         oExp.NumeroCargo = dr["NumeroCargo"].ToString();
                         oExp.NombreFileCargo = dr["NombreFileCargo"].ToString();
-                        if (Convert.ToInt32(dr["IDTipoMov"]) == 4) { oExp.Ing_Evaluador = dr["EntidadDestino"].ToString(); }
-                        else { oExp.UndEjec_CAC = dr["EntidadDestino"].ToString(); }
+                        oExp.EntidadDestino = dr["EntidadDestino"].ToString();
                         oExp.Observaciones = dr["Observaciones"].ToString();
                         oExp.FechaFinal = dr["FechaFinal"].ToString();
                         oExp.Estado = dr["Estado"].ToString();
@@ -324,6 +323,60 @@ namespace DataAccess
                 oCon.Close();
             }
             return oExp;
+        }
+
+        public List<BETrazaSITRAD> fnTrazabilidadSITRAD(string vNumeroHT)
+        {
+            string[] valores = vNumeroHT.Split(Convert.ToChar("-"));
+            int IDTramite = Convert.ToInt32(valores[0]);
+            int Anio = Convert.ToInt32(valores[1]); ;
+            int FK_Id_Tramite = -1;
+            List<BETrazaSITRAD> listado = new List<BETrazaSITRAD>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand("spBuscarTramite", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@idtramite", IDTramite);
+                cmd.Parameters.AddWithValue("@anno", Anio);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        FK_Id_Tramite = Convert.ToInt32(dr["FK_Id_Tramite"]);                       
+                    }
+                }
+                cmd = new SqlCommand("sp_get_derivaciones_new", oCon);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@PK_ID_TRAMITE", FK_Id_Tramite);
+                oCon.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                {
+                    while (dr.Read())
+                    {
+                        BETrazaSITRAD oTraza = new BETrazaSITRAD();
+                        oTraza.Nro = Convert.ToInt32(dr["number"]);
+                        oTraza.Documento = dr["DOCUMENTO"].ToString();
+                        oTraza.EnviaArea = dr["REMITENTE"].ToString();
+                        oTraza.EnviaFecha = dr["Fecha_Modificacion"].ToString();
+                        oTraza.RecibeArea = dr["DESTINATARIO"].ToString();
+                        oTraza.RecibeFecha = dr["FECHA_ATENCION"].ToString();
+                        oTraza.Estado = dr["Descripcion"].ToString();
+                        oTraza.Dias = Convert.ToInt32(dr["DIAS_QUE_LO_TIENE"]);
+                        oTraza.Observaciones = dr["Observaciones"].ToString();
+                        listado.Add(oTraza);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                oCon.Close();
+            }
+            return listado;
         }
     }
 }

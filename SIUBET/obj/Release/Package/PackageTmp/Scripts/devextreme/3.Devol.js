@@ -9,7 +9,7 @@
     });
 
     $("#btnBuscar").on("click", function () {
-        fnListarDevoluciones(0);
+        fnListarMovimientos(0, 2, gridDevoluciones.dxDataGrid("instance"));
     });
 
     gridDevoluciones = $("#gridDevoluciones").dxDataGrid({
@@ -36,7 +36,7 @@
             },
             { dataField: "FechaMov", caption: "Fec. Salida", alignment: "center", width: 140, },
             { dataField: "Responsable", width: 150, },
-            { dataField: "TipoMov", caption: "T.Mov.", width: 100, },
+            { dataField: "TipoMov", caption: "T.Mov.", width: 120, },
             {
                 caption: "N° Cargo",
                 alignment: "center",
@@ -141,11 +141,11 @@
             allowedPageSizes: [10, 20, 50, 100, 200],
             infoText: $infoTextPaginado,
         },
-        "export": {
-            enabled: true,
-            fileName: "Listado Movimientos",
-            allowExportSelectedData: true
-        },
+        //"export": {
+        //    enabled: true,
+        //    fileName: "Listado Movimientos",
+        //    allowExportSelectedData: true
+        //},
         loadPanel: {
             text: $textLoad
         },

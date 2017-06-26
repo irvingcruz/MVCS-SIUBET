@@ -43,7 +43,7 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="form-group">
-                <div id="gridExpedientesSelectedPRE"></div>
+                <div id="gridExpedientesSelectedTRA"></div>
                 @Html.EditorFor(model => model.ET_selected_T, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
                 @Html.EditorFor(model => model.IDTipoMov, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
                 @Html.EditorFor(model => model.IDMovimiento, new { htmlAttributes = new { @class = "form-control", @style = "display:none;" } })
@@ -98,7 +98,7 @@
         });
     });
 
-    var gridExpedientesSelected = $("#gridExpedientesSelectedPRE").dxDataGrid({
+    var gridExpedientesSelected = $("#gridExpedientesSelectedTRA").dxDataGrid({
         columns: [
 			{ dataField: "Nro", caption: "#" },
 			//{ dataField: "IDVersion", caption: "ID", },

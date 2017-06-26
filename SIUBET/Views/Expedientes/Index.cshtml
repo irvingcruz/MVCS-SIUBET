@@ -54,7 +54,12 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xs-12 text-right">
+                <div class="col-xs-12 col-md-2">
+                </div>
+                <div class="col-xs-12 col-md-2 text-center">
+                    <button type="button" class="btn btn-success" id="btnSITRAD"><span class="glyphicon glyphicon-tasks"></span> Traza SITRAD</button>
+                </div>
+                <div class="col-xs-12 col-md-8 text-right">
                     <button type="button" class="btn btn-primary" id="btnBuscar"><span class="glyphicon glyphicon-search"></span> Buscar</button>
                     <button type="button" class="btn btn-default" id="btnLimpiar"><span class="glyphicon glyphicon-remove"></span> Limpiar</button>
                 </div>
@@ -104,5 +109,14 @@
         </div>
     </div>
 </div>
-<input class="form-control" type="hidden" id="et_selected" name="et_selected" value="" />
+<div class="row">
+    <div class="col-xs-12">
+        <div id="popup-SITRAD" style="display: none">
+            <div id="NoteScroll" data-bind="dxScrollView: {}">
+                <div id="gridSITRAD"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<input class="form-control" type="hidden" id="ets_selected" name="ets_selected" value="" />
 

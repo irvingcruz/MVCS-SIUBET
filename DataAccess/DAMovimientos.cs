@@ -30,10 +30,10 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@IDTipoMov", oDD.IDTipoMov);
                 cmd.Parameters.AddWithValue("@IDResponsable", oDD.IDResponsable);
                 cmd.Parameters.AddWithValue("@NumeroCargo", oDD.NumeroCargo);                
-                cmd.Parameters.AddWithValue("@UndEjec_CAC", oDD.UndEjec_CAC);
+                cmd.Parameters.AddWithValue("@UndEjec_CAC", oDD.EntidadDestino);
                 cmd.Parameters.AddWithValue("@TipoDevolucion", oDD.TipoDevolucion);
                 cmd.Parameters.AddWithValue("@Observaciones", oDD.Observaciones);
-                cmd.Parameters.AddWithValue("@IdsExpedientes", oDD.ET_selected_D);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oDD.ET_selected);
                 //string vFileEmision = null;
                 //if (oDD.NombreFileEmision != null && oDD.NombreFileEmision.Length > 0) vFileEmision = "ok";
                 cmd.Parameters.AddWithValue("@FileEmision", oDD.NombreFileEmision);
@@ -117,16 +117,14 @@ namespace DataAccess
                         oMov.Responsable = dr["Responsable"].ToString();
                         oMov.NumeroCargo = dr["NumeroCargo"].ToString();
                         oMov.NombreFileCargo = dr["NombreFileCargo"].ToString();
-
-                        if (oMov.IDTipoMov == 4) oMov.Ing_Evaluador = dr["EntidadDestino"].ToString();
-                        if (oMov.IDTipoMov == 2 || oMov.IDTipoMov == 5) oMov.UndEjec_CAC = dr["EntidadDestino"].ToString();
+                        oMov.EntidadDestino = dr["EntidadDestino"].ToString();
                         if (oMov.IDTipoMov == 1) oMov.Responsable = dr["EntidadDestino"].ToString();
-
                         oMov.FechaFinal = dr["FechaFinal"].ToString();
                         oMov.NombreFileFinal= dr["NombreFileFinal"].ToString();
                         oMov.Plazo = Convert.ToInt32(dr["Plazo"]);
                         oMov.FechaRetornoEstimada = dr["FechaRetornoEstimada"].ToString();
                         oMov.Estado = dr["Estado"].ToString();
+                        oMov.ModalidadTexto = dr["Modalidad"].ToString();
                         oMov.Motivo = dr["Motivo"].ToString();
                         oMov.Activo = Convert.ToBoolean(dr["Activo"]);
                         listado.Add(oMov);
@@ -154,7 +152,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@IDMovimiento", oMov.IDMovimiento);
                 cmd.Parameters.AddWithValue("@FechaFinal", oMov.FechaFinal);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oMov.ExtensionFile);
-                cmd.Parameters.AddWithValue("@IdsExpedientes", oMov.ET_selected_P);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oMov.ET_selected);
                 cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
@@ -179,6 +177,10 @@ namespace DataAccess
             bool rpta = false;
             try
             {
+                string Modalidad = null;
+                if (oPrestamo.Modalidad != null) {
+                    Modalidad =  String.Join(",", oPrestamo.Modalidad);
+                } 
                 SqlCommand cmd = new SqlCommand("spiSUX_InsertarMovPrestamo", oCon);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@IDMovimiento", oPrestamo.IDMovimiento).Direction = ParameterDirection.InputOutput;
@@ -186,10 +188,11 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@FechaMov", oPrestamo.FechaMov);
                 cmd.Parameters.AddWithValue("@IDTipoMov", oPrestamo.IDTipoMov);
                 cmd.Parameters.AddWithValue("@Plazo", oPrestamo.Plazo);                
-                cmd.Parameters.AddWithValue("@Ing_Evaluador", oPrestamo.Ing_Evaluador);
+                cmd.Parameters.AddWithValue("@Ing_Evaluador", oPrestamo.EntidadDestino);
                 cmd.Parameters.AddWithValue("@Observaciones", oPrestamo.Observaciones);                
-                cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected_P);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oPrestamo.ExtensionFile);
+                cmd.Parameters.AddWithValue("@Modalidad", Modalidad);
                 cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;
                 cmd.Parameters.AddWithValue("@Archivo", "0-0000-0000").Direction = ParameterDirection.InputOutput;
@@ -255,13 +258,13 @@ namespace DataAccess
                         oMov.IDTipoMov = Convert.ToInt32(dr["IDTipoMov"]);
                         oMov.FechaEmision = dr["FechaEmision"].ToString();                        
                         oMov.FechaMov = dr["FechaMov"].ToString();                                                                        
-                        oMov.Ing_Evaluador = dr["EntidadDestino"].ToString();
-                        oMov.UndEjec_CAC = dr["EntidadDestino"].ToString();
+                        oMov.EntidadDestino = dr["EntidadDestino"].ToString();
                         oMov.Correo = dr["Correo"].ToString();
                         oMov.Plazo = Convert.ToInt32(dr["Plazo"]);
                         oMov.Observaciones = dr["Observaciones"].ToString();
                         oMov.Correlativo = dr["Correlativo"].ToString();
-                        oMov.ET_selected_P = dr["IdsExpedientes"].ToString();
+                        oMov.ModalidadTexto = dr["Modalidad"].ToString();
+                        oMov.ET_selected = dr["IdsExpedientes"].ToString();
                     }
                 }
             }
@@ -324,7 +327,7 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@IDTipoMov", oPrestamo.IDTipoMov);
                 cmd.Parameters.AddWithValue("@Responsable", oPrestamo.Responsable);
                 cmd.Parameters.AddWithValue("@Observaciones", oPrestamo.Observaciones);
-                cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected_T);
+                cmd.Parameters.AddWithValue("@IdsExpedientes", oPrestamo.ET_selected);
                 cmd.Parameters.AddWithValue("@ExtensionFile", oPrestamo.ExtensionFile);
                 cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 cmd.Parameters.AddWithValue("@rpta", 0).Direction = ParameterDirection.InputOutput;

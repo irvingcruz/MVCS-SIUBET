@@ -20,24 +20,25 @@ namespace SIUBET.Controllers
             if (Usuario == null || Usuario.Length == 0)
             {
                 BEUsuario oUsuario = new BEUsuario();
-                ViewBag.ReturnUrl = ReturnUrl;                
+                ViewBag.ReturnUrl = ReturnUrl;
                 return PartialView(oUsuario);
             }
             else
             {
-                if (ReturnUrl == null || ReturnUrl == "/") return RedirectToAction("Index", "Expedientes");                
-                else return RedirectToAction("AccessDenied", "Account"); 
+                if (ReturnUrl == null || ReturnUrl == "/") return RedirectToAction("Index", "Expedientes");
+                else return RedirectToAction("AccessDenied", "Account");
             }
         }
 
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(BEUsuario oUsuario, string ReturnUrl = "") {
+        public ActionResult Login(BEUsuario oUsuario, string ReturnUrl = "")
+        {
             if (new BLUsuario().fnAutenticacion(oUsuario))
             {
                 FormsAuthentication.SetAuthCookie(oUsuario.UserName, oUsuario.Recordarme);
-                
+
                 System.Web.HttpContext.Current.Session["Usuario"] = oUsuario;
                 if (Url.IsLocalUrl(ReturnUrl))
                 {
@@ -53,13 +54,15 @@ namespace SIUBET.Controllers
             return PartialView();
         }
         [Authorize]
-        public ActionResult Logout() {
+        public ActionResult Logout()
+        {
             FormsAuthentication.SignOut();
-            return RedirectToAction("Login","Account");
+            return RedirectToAction("Login", "Account");
         }
 
         [Authorize]
-        public ActionResult AccessDenied() {
+        public ActionResult AccessDenied()
+        {
             ViewBag.Mensaje = "Lo sentimos, usted no tiene los permisos adecuados...!";
             return View();
         }

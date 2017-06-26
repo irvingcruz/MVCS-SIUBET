@@ -11,6 +11,7 @@ namespace SIUBET.Models
         public List<BEExpediente> items { get; set; }
         public List<BEMovimiento> items2 { get; set; }
         public List<BEPersona> items3 { get; set; }
+        public List<BETrazaSITRAD> items4 { get; set; }
         public BEMovimiento Movimiento { get; set; }
         public int totalRows { get; set; }
         public int totalRowsFilter { get; set; }

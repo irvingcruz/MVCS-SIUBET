@@ -5,6 +5,7 @@
 
     if ($localhost == "localhost:") { $urlReal += $urlDomain + '/'; }
     else { $urlReal += $urlDomain + '/SIUBET/'; }
+
 $(document).ready(function () {
 
 
@@ -14,7 +15,10 @@ $(document).ready(function () {
 	txtSnip = $("#txtSnip").dxTextBox({
 		placeholder: "Escribir Snip...",
 		showClearButton: true,
-	});	
+	});
+
+
+
 });
 
 function openPopupAnular(options) {
@@ -183,6 +187,11 @@ function openPopupRetornaRecepciona(options) {
     RetornaRecepciona.dxPopup("instance").show();
 }
 
+function fnLimpiarDivs(){
+    $("#popup-DD").empty();
+    $("#popup-prestamo").empty();
+    $("#popup-transferencia").empty();
+}
 
 
 

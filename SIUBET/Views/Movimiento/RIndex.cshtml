@@ -1,0 +1,72 @@
+﻿<script src="~/Scripts/devextreme/6.Servi.js"></script>
+@{
+    ViewBag.Title = "Servicios Archivísticos";
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseET" aria-expanded="true" aria-controls="collapseOne">
+                Control de Servicios Archivísticos
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body panel-collapse collapse in" id="collapseET">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4 style="font-weight: bold;">Filtros de Búsqueda</h4>
+                <small style="font-size:70%;"><i>(Utilize los siguientes filtros para agilizar su búsqueda)</i></small>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label>SNIP</label>
+                    <div id="txtSnip"></div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-9 text-right">
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div>
+                        <button type="button" class="btn btn-primary" id="btnBuscar"><span class="glyphicon glyphicon-search"></span> Buscar</button>
+                        <button type="button" class="btn btn-default" id="btnLimpiar"><span class="glyphicon glyphicon-remove"></span> Limpiar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-xs-12">
+                <div id="gridPrestamos"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*@RenderPage("../IncludePartials/PopupAnular.cshtml")*@
+<div id="popup-Anular" style="display:none">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group">
+                <label>Motivo</label>
+                <div id="motivoAnulacion"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 text-right">
+            <div id="btnAnular"></div>
+            <div id="btnCancelar"></div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <div id="popup-prestamo-edit" style="display: none;"></div>
+    </div>
+</div>
+

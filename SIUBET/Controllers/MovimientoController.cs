@@ -20,17 +20,15 @@ namespace SIUBET.Controllers
 
         public ActionResult DDCrear(int id)
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarCbo("01"), "Codigo", "Descripcion");
-                ViewData["Tipos"] = new SelectList(new BLMovimientos().fnListarCbo("02"), "Codigo", "Descripcion");
-                BEMovimiento oDD = new BEMovimiento();
-                oDD.FechaMov = DateTime.Now.ToShortDateString();
-                oDD.FechaEmision = oDD.FechaMov;
-                oDD.IDTipoMov = id; //[2]Devolución [5]Derivación
-                return PartialView(oDD);
-            //}
+
+            ViewData["Responsables"] = new SelectList(new BLMovimientos().fnListarCbo("01"), "Codigo", "Descripcion");
+            ViewData["Tipos"] = new SelectList(new BLMovimientos().fnListarCbo("02"), "Codigo", "Descripcion");
+            BEMovimiento oDD = new BEMovimiento();
+            oDD.FechaMov = DateTime.Now.ToShortDateString();
+            oDD.FechaEmision = oDD.FechaMov;
+            oDD.IDTipoMov = id; //[2]Devolución [5]Derivación
+            return PartialView(oDD);
+
         }
         [HttpPost]
         public ActionResult DDCrear(BEMovimiento oDD)
@@ -48,7 +46,7 @@ namespace SIUBET.Controllers
                     result.message = "Ingrese el número de cargo";
                     goto Terminar;
                 }
-                if (oDD.UndEjec_CAC == null || oDD.UndEjec_CAC.Trim().Length <= 0)
+                if (oDD.EntidadDestino == null || oDD.EntidadDestino.Trim().Length <= 0)
                 {
                     result.message = oDD.IDTipoMov == 2 ? "Seleccione ó Ingrese la Unidad Ejecutora" : "Seleccione un CAC";
                     goto Terminar;
@@ -95,8 +93,8 @@ namespace SIUBET.Controllers
                 }
 
                 oDD.ExtensionFile = Path.GetExtension(oDD.FileCargo.FileName);
-                
-                rpta = new BLMovimientos().fnInsertarMovDD(oDD,  User.Identity.Name);
+
+                rpta = new BLMovimientos().fnInsertarMovDD(oDD, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -127,21 +125,15 @@ namespace SIUBET.Controllers
         }
         public ActionResult DDIndex()
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-                return View();
-        }                
+            return View();
+        }
         public ActionResult DDRecepcionar(int id)
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                BEMovimiento oDD = new BEMovimiento();
-                oDD.IDMovimiento = id;
-                oDD.FechaFinal = DateTime.Now.ToShortDateString();
+            BEMovimiento oDD = new BEMovimiento();
+            oDD.IDMovimiento = id;
+            oDD.FechaFinal = DateTime.Now.ToShortDateString();
 
-                return PartialView(oDD);
-            //}
+            return PartialView(oDD);
         }
         [HttpPost]
         public ActionResult DDRecepcionar(BEMovimiento oDD)
@@ -152,7 +144,8 @@ namespace SIUBET.Controllers
             bool rpta = false;
             try
             {
-                if (oDD.FileFinal == null) {
+                if (oDD.FileFinal == null)
+                {
                     result.message = "Debe anexar un documento.";
                     goto Terminar;
                 }
@@ -186,9 +179,8 @@ namespace SIUBET.Controllers
             return new JsonResult { Data = result };
         }
         [HttpPost]
-        public JsonResult ListadoMovimientos(int Snip,int IDTipoMov, int pageNumber, int pageSize)
+        public JsonResult ListadoMovimientos(int Snip, int IDTipoMov, int pageNumber, int pageSize)
         {
-
             if (!Request.IsAjaxRequest()) return null;
             ObjetoJson result = new ObjetoJson();
 
@@ -203,19 +195,16 @@ namespace SIUBET.Controllers
             result.success = true;
             result.message = totalRowsFilter + " registros encontrados";
 
-
             return new JsonResult { Data = result };
         }
         public ActionResult PreIndex()
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-                return View();
+            return View();
         }
         public ActionResult PreCrear(string ets) //ExpdientesTécnicos (1|2|..|n)
         {
             BEMovimiento oPrestamo = new BEMovimiento();
-            oPrestamo.ET_selected_P = ets;
+            oPrestamo.ET_selected = ets;
             oPrestamo.FechaMov = DateTime.Now.ToShortDateString();
             oPrestamo.FechaEmision = oPrestamo.FechaMov;
             oPrestamo.Plazo = 30;
@@ -223,14 +212,11 @@ namespace SIUBET.Controllers
             oPrestamo.PadreHome = 1;
             return PartialView(oPrestamo);
         }
-        public ActionResult PreEditar(int id) {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                BEMovimiento oPrestamo = new BEMovimiento();
-                oPrestamo = new BLMovimientos().fnObtenerMovimiento(id);
-                return PartialView("PreCrear", oPrestamo);
-            //}
+        public ActionResult PreEditar(int id)
+        {
+            BEMovimiento oPrestamo = new BEMovimiento();
+            oPrestamo = new BLMovimientos().fnObtenerMovimiento(id);
+            return PartialView("PreCrear", oPrestamo);
         }
         [HttpPost]
         public ActionResult PreCrear(BEMovimiento oPrestamo)
@@ -241,7 +227,7 @@ namespace SIUBET.Controllers
             bool rpta = false;
             try
             {
-                if (oPrestamo.Ing_Evaluador == null || oPrestamo.Ing_Evaluador.Trim().Length <= 0)
+                if (oPrestamo.EntidadDestino == null || oPrestamo.EntidadDestino.Trim().Length <= 0)
                 {
                     result.message = "Ingrese el Ingeniero/Otros";
                     goto Terminar;
@@ -249,6 +235,11 @@ namespace SIUBET.Controllers
 
                 if (oPrestamo.Print == 1)
                 {
+                    if (oPrestamo.FileCargo != null)
+                    {
+                        result.message = "Ya existe un archivo anexado.";
+                        goto Terminar;                        
+                    }
                     rpta = new BLMovimientos().fnInsertarMovPrestamo(oPrestamo, User.Identity.Name);
                     if (rpta)
                     {
@@ -317,14 +308,10 @@ namespace SIUBET.Controllers
         }
         public ActionResult PreRetornar(int id)
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                BEMovimiento oDevolucion = new BEMovimiento();
-                oDevolucion.IDMovimiento = id;
-                oDevolucion.FechaFinal = DateTime.Now.ToShortDateString();
-                return PartialView(oDevolucion);
-            //}
+            BEMovimiento oDevolucion = new BEMovimiento();
+            oDevolucion.IDMovimiento = id;
+            oDevolucion.FechaFinal = DateTime.Now.ToShortDateString();
+            return PartialView(oDevolucion);
         }
         [HttpPost]
         public ActionResult PreRetornar(BEMovimiento oPrestamo)
@@ -341,19 +328,20 @@ namespace SIUBET.Controllers
                     goto Terminar;
                 }
 
-                if (oPrestamo.ET_selected_P == null || oPrestamo.ET_selected_P.Length == 0) {
+                if (oPrestamo.ET_selected == null || oPrestamo.ET_selected.Length == 0)
+                {
                     result.message = "Debe seleccionar uno o más registros.";
                     goto Terminar;
                 }
 
                 if (oPrestamo.FileFinal.ContentLength > Global.iMaxSizeFile)
-                {                    
+                {
                     result.message = Global.vMsgFileSizeFail + oPrestamo.FileFinal.FileName + ")";
                     goto Terminar;
                 }
 
                 var supportedTypes = new[] { Global.vPDF };
-                var fileExtEmision = System.IO.Path.GetExtension(oPrestamo.FileFinal.FileName).Substring(1);                
+                var fileExtEmision = System.IO.Path.GetExtension(oPrestamo.FileFinal.FileName).Substring(1);
                 if (!supportedTypes.Contains(fileExtEmision))
                 {
                     result.message = Global.vMsgFileTypefail;
@@ -421,33 +409,25 @@ namespace SIUBET.Controllers
             //result.message = message;
             return new JsonResult { Data = result };
         }
-        public ActionResult TIndex() {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-                return View();
+        public ActionResult TIndex()
+        {
+            return View();
         }
-        public ActionResult TCrear(string ets) {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                BEMovimiento oTransf = new BEMovimiento();
-                oTransf.ET_selected_T = ets;
-                oTransf.FechaEmision = DateTime.Now.ToShortDateString();
-                oTransf.IDTipoMov = 1; //Transferencias
-                return PartialView(oTransf);
-            //}
+        public ActionResult TCrear(string ets)
+        {
+            BEMovimiento oTransf = new BEMovimiento();
+            oTransf.ET_selected = ets;
+            oTransf.FechaEmision = DateTime.Now.ToShortDateString();
+            oTransf.IDTipoMov = 1; //Transferencias
+            return PartialView(oTransf);
         }
         public ActionResult TEditar(int id)
         {
-            //if (oUsuario == null) return RedirectToAction("Logout", "Account");
-            //else
-            //{
-                BEMovimiento oTransf = new BEMovimiento();
-                oTransf = new BLMovimientos().fnObtenerMovimiento(id);
-                oTransf.Responsable = oTransf.UndEjec_CAC;
-                oTransf.ET_selected_T = oTransf.ET_selected_P;
-                return PartialView("TCrear", oTransf);
-            //}
+            BEMovimiento oTransf = new BEMovimiento();
+            oTransf = new BLMovimientos().fnObtenerMovimiento(id);
+            oTransf.Responsable = oTransf.EntidadDestino;
+            oTransf.ET_selected = oTransf.ET_selected;
+            return PartialView("TCrear", oTransf);
         }
         [HttpPost]
         public ActionResult TCrear(BEMovimiento oTransf)
@@ -517,10 +497,12 @@ namespace SIUBET.Controllers
             result.success = rpta;
             //result.message = message;
             return new JsonResult { Data = result };
-        }       
-        public bool GenerarDocumentoExcel(int id) {
+        }
+        public bool GenerarDocumentoExcel(int id)
+        {
             bool rpta = false;
-            if (id > 0) {
+            if (id > 0)
+            {
                 FileInfo newFile = new FileInfo(Server.MapPath("~/Uploads/" + "DocGenerado.xlsx"));
                 if (newFile.Exists)
                 {
@@ -551,7 +533,7 @@ namespace SIUBET.Controllers
                     ws.Cells["C11"].Value = "SEDE";
                     ws.Cells["C12"].Value = "CORREO";
 
-                    ws.Cells["F9"].Value = oRpt.Ing_Evaluador;
+                    ws.Cells["F9"].Value = oRpt.EntidadDestino;
                     ws.Cells["F10"].Value = "";
                     ws.Cells["F11"].Value = "OLAECHEA";
                     ws.Cells["F12"].Value = oRpt.Correo;
@@ -559,7 +541,7 @@ namespace SIUBET.Controllers
                     ws.Cells["C9:K12"].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                     ws.Cells["C14"].Value = "TIPO DEL SERVICIO";
-                    ws.Cells["F14"].Value = "";
+                    ws.Cells["F14"].Value = oRpt.ModalidadTexto;
 
                     ws.Cells["C16"].Value = "ITEM";
                     ws.Cells["D16"].Value = "SNIP";
@@ -664,14 +646,22 @@ namespace SIUBET.Controllers
             }
             return rpta;
         }
-        public ActionResult RCrear(string ets) {
+        public ActionResult RIndex() { return View(); }
+        public ActionResult RCrear(string ets)
+        {
             BEMovimiento oRep = new BEMovimiento();
-            oRep.ET_selected_P = ets;
+            oRep.ET_selected = ets;
             oRep.FechaMov = DateTime.Now.ToShortDateString();
-            oRep.FechaEmision = oRep.FechaMov;           
+            oRep.FechaEmision = oRep.FechaMov;
             oRep.IDTipoMov = 6; //Reprografia 
-            oRep.PadreHome = 1;       
+            oRep.PadreHome = 1;
             return PartialView(oRep);
+        }
+        public ActionResult REditar(int id)
+        {
+            BEMovimiento oServ = new BEMovimiento();
+            oServ = new BLMovimientos().fnObtenerMovimiento(id);
+            return PartialView("RCrear", oServ);
         }
         [HttpPost]
         public ActionResult RCrear(BEMovimiento oRep)
@@ -682,14 +672,26 @@ namespace SIUBET.Controllers
             bool rpta = false;
             try
             {
-                if (oRep.Ing_Evaluador == null || oRep.Ing_Evaluador.Trim().Length <= 0)
+                if (oRep.Modalidad == null)
+                {
+                    result.message = "Favor de elegir uno o mas modalidades de servicio.";
+                    goto Terminar;
+                }
+
+                if (oRep.EntidadDestino == null || oRep.EntidadDestino.Trim().Length <= 0)
                 {
                     result.message = "Ingrese el Ingeniero/Otros";
                     goto Terminar;
                 }
+                
 
                 if (oRep.Print == 1)
                 {
+                    if (oRep.FileCargo != null)
+                    {
+                        result.message = "Ya existe un archivo anexado.";
+                        goto Terminar;
+                    }
                     rpta = new BLMovimientos().fnInsertarMovPrestamo(oRep, User.Identity.Name);
                     if (rpta)
                     {
@@ -732,7 +734,7 @@ namespace SIUBET.Controllers
                     oRep.ExtensionFile = Path.GetExtension(oRep.FileCargo.FileName);
                 }
 
-                if(oRep.Print == 0) rpta = new BLMovimientos().fnInsertarMovPrestamo(oRep, User.Identity.Name);
+                if (oRep.Print == 0) rpta = new BLMovimientos().fnInsertarMovPrestamo(oRep, User.Identity.Name);
 
                 if (rpta)
                 {
@@ -743,10 +745,10 @@ namespace SIUBET.Controllers
                     }
                     result.message = Global.vMsgSuccess;
                 }
-                else result.message = Global.vMsgFail;                
+                else result.message = Global.vMsgFail;
 
             }
-            catch (Exception e) {  result.message = Global.vMsgThrow+":"+e.Message; }
+            catch (Exception e) { result.message = Global.vMsgThrow + ":" + e.Message; }
             Terminar:
             result.items = null;
             result.success = rpta;

@@ -208,13 +208,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/12/2017 09:06:15</publishTime>
     </File>
     <File Include="bin/BusinessEntity.dll">
-      <publishTime>06/22/2017 11:49:51</publishTime>
+      <publishTime>06/23/2017 18:23:49</publishTime>
     </File>
     <File Include="bin/BusinessLogic.dll">
-      <publishTime>06/22/2017 11:49:52</publishTime>
+      <publishTime>06/23/2017 18:23:49</publishTime>
     </File>
     <File Include="bin/DataAccess.dll">
-      <publishTime>06/22/2017 11:49:52</publishTime>
+      <publishTime>06/23/2017 18:23:49</publishTime>
     </File>
     <File Include="bin/EPPlus.dll">
       <publishTime>07/14/2016 10:21:04</publishTime>
@@ -307,7 +307,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/12/2017 09:06:15</publishTime>
     </File>
     <File Include="bin/SIUBET.dll">
-      <publishTime>06/22/2017 11:49:55</publishTime>
+      <publishTime>06/23/2017 18:23:53</publishTime>
     </File>
     <File Include="bin/System.Web.Helpers.dll">
       <publishTime>06/12/2017 09:06:13</publishTime>
@@ -388,16 +388,16 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/21/2017 10:02:07</publishTime>
     </File>
     <File Include="Scripts/devextreme/2.Exped.js">
-      <publishTime>06/22/2017 11:52:19</publishTime>
+      <publishTime>06/23/2017 16:19:07</publishTime>
     </File>
     <File Include="Scripts/devextreme/3.Devol.js">
-      <publishTime>06/15/2017 17:59:50</publishTime>
+      <publishTime>06/23/2017 17:58:47</publishTime>
     </File>
     <File Include="Scripts/devextreme/4.Presta.js">
-      <publishTime>06/15/2017 18:00:44</publishTime>
+      <publishTime>06/23/2017 17:58:23</publishTime>
     </File>
     <File Include="Scripts/devextreme/5.Transf.js">
-      <publishTime>06/15/2017 17:38:48</publishTime>
+      <publishTime>06/23/2017 17:58:36</publishTime>
     </File>
     <File Include="Scripts/devextreme/css/dx.android5.light.css">
       <publishTime>06/12/2017 09:06:18</publishTime>
@@ -637,10 +637,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/20/2017 18:04:57</publishTime>
     </File>
     <File Include="Views/Expedientes/Index.cshtml">
-      <publishTime>06/21/2017 10:10:07</publishTime>
+      <publishTime>06/23/2017 16:09:26</publishTime>
     </File>
     <File Include="Views/Movimiento/DDCrear.cshtml">
-      <publishTime>06/21/2017 10:58:10</publishTime>
+      <publishTime>06/23/2017 16:49:42</publishTime>
     </File>
     <File Include="Views/Movimiento/DDIndex.cshtml">
       <publishTime>06/15/2017 12:43:56</publishTime>
@@ -658,7 +658,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/12/2017 09:06:19</publishTime>
     </File>
     <File Include="Views/Movimiento/PreCrear.cshtml">
-      <publishTime>06/21/2017 11:04:24</publishTime>
+      <publishTime>06/23/2017 18:17:58</publishTime>
     </File>
     <File Include="Views/Movimiento/PreIndex.cshtml">
       <publishTime>06/15/2017 12:44:32</publishTime>
@@ -666,8 +666,11 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Views/Movimiento/PreRetornar.cshtml">
       <publishTime>06/15/2017 18:06:33</publishTime>
     </File>
+    <File Include="Views/Movimiento/RCrear.cshtml">
+      <publishTime>06/23/2017 18:05:28</publishTime>
+    </File>
     <File Include="Views/Movimiento/TCrear.cshtml">
-      <publishTime>06/15/2017 18:06:33</publishTime>
+      <publishTime>06/23/2017 17:09:08</publishTime>
     </File>
     <File Include="Views/Movimiento/TIndex.cshtml">
       <publishTime>06/15/2017 17:11:34</publishTime>
@@ -679,7 +682,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/06/2016 09:31:44</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>06/22/2017 11:57:48</publishTime>
+      <publishTime>06/23/2017 17:38:55</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>06/12/2017 09:06:19</publishTime>
