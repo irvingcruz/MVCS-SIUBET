@@ -32,7 +32,7 @@ namespace SIUBET.Controllers
 
             int totalRows = 0;
             int totalRowsFilter = 0;
-            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, docIngreso, estado, etapa, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
+            List<BEExpediente> datosResult = new BLExpedientes().fnListarExpedientes(snip, numeroHT, docIngreso, estado, etapa,User.Identity.Name, pageNumber, pageSize, ref totalRows, ref totalRowsFilter);
 
             result.items = datosResult;
             result.totalRows = totalRows;

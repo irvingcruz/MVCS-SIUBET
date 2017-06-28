@@ -20,10 +20,7 @@ namespace BusinessLogic
                 DAUsuario obj = new DAUsuario(oCon);
                 return obj.fnAutenticacion(oUsuario);
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            catch (Exception e) { throw e; }
         }
 
         public BEUsuario fnObtenerUsuario(string vUsuario) {
@@ -34,6 +31,31 @@ namespace BusinessLogic
                 return obj.fnObtenerUsuario(vUsuario);
             }
             catch (Exception e) { throw e; }
+        }
+
+        public int fnInsertarUpdateUsuario(BEUsuario oUsuario, string vUsuario)
+        {
+            try
+            {
+                oCon = BLConexion.SIUBET();
+                DAUsuario obj = new DAUsuario(oCon);
+                return obj.fnInsertarUpdateUsuario(oUsuario, vUsuario);
+            }
+            catch (Exception e) { throw e; }
+        }
+        public List<BEPersona> ListarPerfiles()
+        {
+            List<BEPersona> listado = new List<BEPersona>();
+            listado.Add(new BEPersona { IDCodigo = 1, Nombres = "Supervisor" });
+            listado.Add(new BEPersona { IDCodigo = 2, Nombres = "Normal" });
+            return listado;
+        }
+        public List<BEPersona> ListarGrupos()
+        {
+            List<BEPersona> listado = new List<BEPersona>();
+            listado.Add(new BEPersona { IDCodigo = 1, Nombres = "PNSU" });
+            listado.Add(new BEPersona { IDCodigo = 2, Nombres = "PNSR" });
+            return listado;
         }
     }
 }

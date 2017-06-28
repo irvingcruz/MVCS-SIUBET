@@ -1,0 +1,74 @@
+﻿@model BusinessEntity.BEUsuario
+
+@{
+    ViewBag.Title = "Grabar Usuario";
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h4 class="panel-title">Registro de Expedientes</h4>
+    </div>
+    <div class="panel-body panel-collapse collapse in" id="collapseET">
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.IDUsuario)
+            {
+                if (ViewBag.Mensaje != null)
+                {
+                    <div class="alert alert-@ViewBag.Alerta">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                        @ViewBag.Mensaje
+                    </div>
+                }
+            }
+            <div class="row">
+                <div class="col-xs-12 col-md-4">
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        @Html.EditorFor(model => model.Nombres, new { htmlAttributes = new { @class = "form-control", @placeholder = "escribir..." } })
+                        @Html.ValidationMessageFor(model => model.Nombres, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4">
+                    <div class="form-group">
+                        <label>Usuario</label>
+                        @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", @placeholder = "escribir..." } })
+                        @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-4">
+                    <div class="form-group">
+                        <label>Password</label>
+                        @Html.PasswordFor(model => model.Password,  new { @class = "form-control", @placeholder = "*********" } )
+                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Rol</label>
+                        @Html.DropDownListFor(model => model.IDPerfil, ViewData["Roles"] as SelectList, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    <div class="form-group">
+                        <label>Programa</label>
+                        @Html.DropDownListFor(model => model.Grupo, ViewData["Grupos"] as SelectList, new { @class = "form-control" })
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-floppy-disk"></span> Grabar</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

@@ -13,7 +13,7 @@ namespace BusinessLogic
     {
         private SqlConnection oCon;
 
-        public List<BEExpediente> fnListarExpedientes(int snip, string numeroHT, string docIngreso, string estado, string etapa, int pageNumber,int pageSize, ref int totalRows, ref int totalRowsFilter) {
+        public List<BEExpediente> fnListarExpedientes(int snip, string numeroHT, string docIngreso, string estado, string etapa, string vUsuario, int pageNumber,int pageSize, ref int totalRows, ref int totalRowsFilter) {
             try {
                 oCon = BLConexion.SIUBET();
                 DAExpedientes obj = new DAExpedientes(oCon);
@@ -23,7 +23,7 @@ namespace BusinessLogic
                 _oExp.NVersion = docIngreso;
                 _oExp.Estado = estado;
                 _oExp.Etapa = etapa;
-                List<BEExpediente> resultado = obj.fnListarExpedientes(_oExp);
+                List<BEExpediente> resultado = obj.fnListarExpedientes(_oExp,vUsuario);
                 totalRows = resultado.Count();
                 totalRowsFilter = resultado.Count();
                 resultado = resultado.OrderBy(e => e.Nro)

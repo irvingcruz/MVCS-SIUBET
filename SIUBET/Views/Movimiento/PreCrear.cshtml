@@ -141,16 +141,14 @@
 
     var gridExpedientesSelected = $("#gridExpedientesSelected").dxDataGrid({
         columns: [
-			{ dataField: "Nro", caption: "#" },
+			{ dataField: "Nro", caption: "#", width: 50, },
 			//{ dataField: "IDVersion", caption: "ID", },
 			//{ dataField: "IDExpTecnico", caption: "IDExpTec", alignment: "center", },
-			{ dataField: "Snip", alignment: "center", },
+			{ dataField: "Snip", alignment: "center", width: 150, },
 			//{ dataField: "NombreProyecto", caption: "Nombre del Proyecto", width: 550, },
-			{ dataField: "NVersion", caption: "N° Versión", width: 150, },
-            { dataField: "DocumentoOficioSITRAD", width: 250, },
-            { dataField: "FechaOficio", caption: "Fec. Oficio", width: 100, },
-            { dataField: "NumeroHT", width: 100, },
-            { dataField: "FechaIngreso", caption: "Fec. Ingreso", width: 100, },
+            { dataField: "NumeroHT", caption: "Numero HT", width: 200, },
+			{ dataField: "NVersion", caption: "N° Versión", },
+            { dataField: "Etapa", width: 200, },            
 			//{ dataField: "Activo", dataType: "boolean", alignment: "center", },
         ],
         remoteOperations: true,

@@ -16,7 +16,7 @@ namespace DataAccess
             this.oCon = _oCon;
         }
 
-        public List<BEExpediente> fnListarExpedientes(BEExpediente _oExp)
+        public List<BEExpediente> fnListarExpedientes(BEExpediente _oExp, string vUsuario)
         {
             List<BEExpediente> listado = new List<BEExpediente>();
             try
@@ -27,7 +27,8 @@ namespace DataAccess
                 cmd.Parameters.AddWithValue("@NumeroHT", _oExp.NumeroHT);
                 cmd.Parameters.AddWithValue("@DocIngreso", _oExp.NVersion);
                 cmd.Parameters.AddWithValue("@Estado", _oExp.Estado);
-                cmd.Parameters.AddWithValue("@Etapa", _oExp.Etapa);            
+                cmd.Parameters.AddWithValue("@Etapa", _oExp.Etapa);
+                cmd.Parameters.AddWithValue("@Usuario", vUsuario);
                 oCon.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                 {
@@ -78,15 +79,9 @@ namespace DataAccess
                         oExp.Nro = Convert.ToInt32(dr["Nro"]);
                         oExp.IDVersion = Convert.ToInt32(dr["ID"]);
                         oExp.Snip = Convert.ToInt32(dr["Snip"]);
-                        oExp.NVersion = dr["Numero"].ToString();
-                        oExp.DocumentoOficioSITRAD = dr["DocumentoOficioSITRAD"].ToString();
-                        oExp.FechaOficio = dr["FechaOficio"].ToString();
                         oExp.NumeroHT = dr["NumeroHT"].ToString();
-                        oExp.FechaIngreso = dr["FechaIngreso"].ToString();
-                        oExp.Documento = dr["Documento"].ToString();
-                        oExp.UnidadConservacion = dr["UnidadConservacion"].ToString();
-                        oExp.Folios = dr["Folios"].ToString();
-                        oExp.CDs = dr["CDs"].ToString();
+                        oExp.NVersion = dr["NVersion"].ToString();
+                        oExp.Etapa = dr["Etapa"].ToString();
                         listado.Add(oExp);
                     }
                 }

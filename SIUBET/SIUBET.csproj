@@ -162,6 +162,7 @@
     <Compile Include="Models\Global.cs" />
     <Compile Include="Models\ObjetoJson.cs" />
     <Compile Include="Models\MyRoleProvider.cs" />
+    <Compile Include="Models\StringCrypto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -330,6 +331,7 @@
     <Content Include="Views\Expedientes\Crear.cshtml" />
     <Content Include="Views\Expedientes\Etapa.cshtml" />
     <Content Include="Views\Account\AccessDenied.cshtml" />
+    <Content Include="Views\Account\Register.cshtml" />
     <None Include="Views\IncludePartials\PopupAnular.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
